@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %} Test {{ test.title }} {% endblock title %}
+{% block content %}
+<div class="content mt3">
+    <h3>{{ test.title }}</h3>
+    <form class="card p-3" method="post">{% csrf_token %}
+        {% for q in questions %}
+            <h5>{{ forloop.counter }}. {{ q.question }}</h5>
+            <div class="form-check">
+                <input value="a" required name="{{q.id}}" class="form-check-input" id="{{q.id}}-a" type="radio">
+                <label for="{{q.id}}-a">{{q.a}}</label>
+                <br>
+                <input value="b"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-b" type="radio">
+                <label for="{{q.id}}-b">{{q.b}}</label>
+                <br>
+                <input value="c"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-c" type="radio">
+                <label for="{{q.id}}-c">{{q.c}}</label>
+                <br>
+                <input value="d"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-d" type="radio">
+                <label for="{{q.id}}-d">{{q.d}}</label>
+            </div>
+        {% endfor %}
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock content %}

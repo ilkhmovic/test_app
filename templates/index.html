@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %} Home {% endblock title %}
 {% block content %}
-<h1>Welcome to the Test App</h1>
-<p>This is the home page.</p>
+<div class="content mt-3">
+    <h2>Available Tests</h2>
+    <ul>
+        {% for test in tests %}
+            <li><a href="{% url 'ready_to_test' test.id %}">{{ test.title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock content %}
