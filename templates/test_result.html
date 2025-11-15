@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %} Test Natijasi {% endblock title %}
+{% block content %}
+<div class="content mt-3">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Test Natijasi: {{ checktest.test.title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Natija ma'lumotlari:</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>To'g'ri javoblar:</strong> 
+                            <span class="badge bg-success">{{ checktest.finded_questions }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Umumiy savollar:</strong> 
+                            <span class="badge bg-info">{{ check_questions.count }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Foiz:</strong> 
+                            <span class="badge bg-warning text-dark">{{ checktest.percentage }}%</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Test o'tish foizi:</strong> 
+                            <span class="badge bg-secondary">{{ checktest.test.pass_percentage }}%</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Holat:</h5>
+                    <div class="alert {% if checktest.user_passed %}alert-success{% else %}alert-danger{% endif %}">
+                        {% if checktest.user_passed %}
+                            <h4 class="alert-heading">Tabriklaymiz! ✅</h4>
+                            <p class="mb-0">Siz testdan muvaffaqiyatli o'tdingiz!</p>
+                        {% else %}
+                            <h4 class="alert-heading">Afsuski ❌</h4>
+                            <p class="mb-0">Siz testdan o'ta olmadingiz. Qayta urinib ko'ring!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            
+            <h5>Savol va javoblar:</h5>
+            <div class="mt-3">
+                {% for check_question in check_questions %}
+                <div class="card mb-2 {% if check_question.is_true %}border-success{% else %}border-danger{% endif %}">
+                    <div class="card-body">
+                        <h6>{{ forloop.counter }}. {{ check_question.question.question }}</h6>
+                        <p><strong>Sizning javobingiz:</strong> 
+                            <span class="{% if check_question.is_true %}text-success{% else %}text-danger{% endif %}">
+                                {{ check_question.given_answer|upper }} - {{ check_question.question.a }}
+                            </span>
+                        </p>
+                        {% if not check_question.is_true %}
+                        <p><strong>To'g'ri javob:</strong> 
+                            <span class="text-success">{{ check_question.true_answer|upper }} - 
+                                {% if check_question.true_answer == 'a' %}{{ check_question.question.a }}
+                                {% elif check_question.true_answer == 'b' %}{{ check_question.question.b }}
+                                {% elif check_question.true_answer == 'c' %}{{ check_question.question.c }}
+                                {% elif check_question.true_answer == 'd' %}{{ check_question.question.d }}
+                                {% endif %}
+                            </span>
+                        </p>
+                        {% endif %}
+                        <span class="badge {% if check_question.is_true %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if check_question.is_true %}To'g'ri{% else %}Noto'g'ri{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4">
+                <a href="{% url 'index' %}" class="btn btn-primary">Bosh sahifaga qaytish</a>
+                <a href="{% url 'ready_to_test' checktest.test.id %}" class="btn btn-outline-secondary">Qayta urinish</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

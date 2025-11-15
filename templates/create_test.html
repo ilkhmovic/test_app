@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Yangi Test Yaratish {% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Yangi Test Yaratish</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="testForm">
+                {% csrf_token %}
+                
+                <!-- Test ma'lumotlari -->
+                <h5 class="mb-3">Test Ma'lumotlari</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Test Nomi</label>
+                        {{ test_form.title }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kategoriya</label>
+                        {{ test_form.category }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Maksimal Urinishlar</label>
+                        {{ test_form.maximum_attempts }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">O'tish Foizi (%)</label>
+                        {{ test_form.pass_percentage }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Boshlanish Sanasi</label>
+                        {{ test_form.start_date }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tugash Sanasi</label>
+                        {{ test_form.end_date }}
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Savollar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Savollar</h5>
+                    <button type="button" id="addQuestion" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Yangi Savol
+                    </button>
+                </div>
+                
+                <div id="questions-container">
+                    {{ question_formset.management_form }}
+                    
+                    {% for form in question_formset %}
+                    <div class="question-form card mb-3" id="question-{{ forloop.counter0 }}">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Savol {{ forloop.counter }}</h6>
+                            {% if forloop.counter0 > 0 or question_formset|length > 1 %}
+                            <button type="button" class="btn btn-danger btn-sm remove-question" data-index="{{ forloop.counter0 }}">
+                                <i class="fas fa-times"></i> O'chirish
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Savol Matni</label>
+                                {{ form.question }}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">A Variant</label>
+                                    {{ form.a }}
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">B Variant</label>
+                                    {{ form.b }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">C Variant</label>
+                                    {{ form.c }}
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">D Variant</label>
+                                    {{ form.d }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">To'g'ri Javob</label>
+                                    {{ form.true_answer }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save"></i> Testni Saqlash
+                    </button>
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary">Bekor qilish</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Oddiy usul - har doim 1 dan boshlaymiz
+    let questionCount = 1;
+    
+    const questionsContainer = document.getElementById('questions-container');
+    const addButton = document.getElementById('addQuestion');
+    const totalForms = document.getElementById('id_questions-TOTAL_FORMS');
+    
+    console.log('Test yaratish sahifasi yuklandi');
+    
+    // Yangi savol qo'shish
+    addButton.addEventListener('click', function() {
+        console.log('Yangi savol qo\'shilmoqda...');
+        
+        // Yangi savol HTML ni yaratamiz
+        const newQuestionHTML = `
+        <div class="question-form card mb-3" id="question-${questionCount}">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Savol ${questionCount + 1}</h6>
+                <button type="button" class="btn btn-danger btn-sm remove-question" data-index="${questionCount}">
+                    <i class="fas fa-times"></i> O'chirish
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Savol Matni</label>
+                    <textarea name="questions-${questionCount}-question" class="form-control" rows="2" placeholder="Savol matnini kiriting"></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">A Variant</label>
+                        <input type="text" name="questions-${questionCount}-a" class="form-control" placeholder="A variant">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">B Variant</label>
+                        <input type="text" name="questions-${questionCount}-b" class="form-control" placeholder="B variant">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">C Variant</label>
+                        <input type="text" name="questions-${questionCount}-c" class="form-control" placeholder="C variant">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">D Variant</label>
+                        <input type="text" name="questions-${questionCount}-d" class="form-control" placeholder="D variant">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">To'g'ri Javob</label>
+                        <select name="questions-${questionCount}-true_answer" class="form-control">
+                            <option value="">To'g'ri javobni tanlang</option>
+                            <option value="a">A variant</option>
+                            <option value="b">B variant</option>
+                            <option value="c">C variant</option>
+                            <option value="d">D variant</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        // Yangi savolni qo'shamiz
+        questionsContainer.insertAdjacentHTML('beforeend', newQuestionHTML);
+        questionCount++;
+        
+        // TOTAL_FORMS qiymatini yangilaymiz
+        if (totalForms) {
+            totalForms.value = questionCount;
+            console.log('Yangi savollar soni:', totalForms.value);
+        }
+        
+        console.log('Yangi savol qo\'shildi');
+    });
+    
+    // Savolni o'chirish
+    questionsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-question') || e.target.closest('.remove-question')) {
+            const button = e.target.classList.contains('remove-question') ? 
+                e.target : e.target.closest('.remove-question');
+            const index = button.getAttribute('data-index');
+            
+            console.log('Savol o\'chirilmoqda:', index);
+            
+            const questionElement = document.getElementById(`question-${index}`);
+            
+            if (questionElement && questionCount > 1) {
+                questionElement.remove();
+                questionCount--;
+                
+                // TOTAL_FORMS qiymatini yangilaymiz
+                if (totalForms) {
+                    totalForms.value = questionCount;
+                }
+                
+                console.log('Savol o\'chirildi. Yangi son:', questionCount);
+                
+                // Barcha savollarni qayta raqamlash
+                const allQuestions = questionsContainer.querySelectorAll('.question-form');
+                allQuestions.forEach((question, newIndex) => {
+                    question.id = `question-${newIndex}`;
+                    const header = question.querySelector('.card-header h6');
+                    const removeBtn = question.querySelector('.remove-question');
+                    
+                    if (header) header.textContent = `Savol ${newIndex + 1}`;
+                    if (removeBtn) removeBtn.setAttribute('data-index', newIndex);
+                });
+            } else {
+                alert('Kamida bitta savol bo\'lishi kerak!');
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.question-form {
+    border: 2px dashed #e9ecef;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.question-form:hover {
+    border-color: #007bff;
+}
+
+.card {
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 18px;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+#addQuestion {
+    padding: 8px 16px;
+}
+</style>
+{% endblock %}

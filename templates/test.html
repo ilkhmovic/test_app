@@ -1,27 +1,491 @@
 {% extends "base.html" %}
 {% block title %} Test {{ test.title }} {% endblock title %}
 {% block content %}
-<div class="content mt3">
-    <h3>{{ test.title }}</h3>
-    <form class="card p-3" method="post">{% csrf_token %}
-        {% for q in questions %}
-            <h5>{{ forloop.counter }}. {{ q.question }}</h5>
-            <div class="form-check">
-                <input value="a" required name="{{q.id}}" class="form-check-input" id="{{q.id}}-a" type="radio">
-                <label for="{{q.id}}-a">{{q.a}}</label>
-                <br>
-                <input value="b"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-b" type="radio">
-                <label for="{{q.id}}-b">{{q.b}}</label>
-                <br>
-                <input value="c"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-c" type="radio">
-                <label for="{{q.id}}-c">{{q.c}}</label>
-                <br>
-                <input value="d"  name="{{q.id}}" class="form-check-input" id="{{q.id}}-d" type="radio">
-                <label for="{{q.id}}-d">{{q.d}}</label>
+<div class="container py-4">
+    <!-- Test sarlavhasi -->
+    <div class="test-header card border-0 shadow-sm mb-4">
+        <div class="card-body bg-primary text-white rounded-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="h2 fw-bold mb-2">{{ test.title }}</h1>
+                    <div class="d-flex flex-wrap gap-3 text-white-50">
+                        <span class="d-flex align-items-center">
+                            <i class="fas fa-layer-group me-2"></i>
+                            {{ test.category.name }}
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <i class="fas fa-question-circle me-2"></i>
+                            {{ questions|length }} ta savol
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <i class="fas fa-clock me-2"></i>
+                            {{ questions|length }} daqiqa
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="test-info bg-white bg-opacity-10 p-3 rounded-2 d-inline-block">
+                        <div class="text-warning fw-bold fs-5">{{ questions|length }} savol</div>
+                        <small class="text-white-50">Test davomiyligi</small>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-        <br>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-container mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <small class="text-muted">Test jarayoni</small>
+            <small class="text-muted"><span id="currentQuestion">1</span>/{{ questions|length }}</small>
+        </div>
+        <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 0%" 
+                 id="progressBar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+
+    <form method="post" id="testForm" class="test-form">
+        {% csrf_token %}
+        
+        <!-- Savollar -->
+        <div class="questions-container">
+            {% for question in questions %}
+            <div class="question-card card border-0 shadow-sm mb-4" id="question-{{ forloop.counter }}" 
+                 {% if not forloop.first %}style="display: none;"{% endif %}>
+                <div class="card-header bg-light border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">
+                            <i class="fas fa-question-circle me-2"></i>
+                            Savol {{ forloop.counter }}
+                        </h5>
+                        <span class="badge bg-primary">{{ forloop.counter }}/{{ questions|length }}</span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Savol matni -->
+                    <div class="question-text mb-4">
+                        <p class="fs-5 fw-semibold text-dark">{{ question.question }}</p>
+                    </div>
+
+                    <!-- Javob variantlari -->
+                    <div class="options-container">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="option-card">
+                                    <input type="radio" name="{{ question.id }}" value="a" 
+                                           id="{{ question.id }}-a" class="option-input">
+                                    <label for="{{ question.id }}-a" class="option-label">
+                                        <span class="option-letter">A</span>
+                                        <span class="option-text">{{ question.a }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="option-card">
+                                    <input type="radio" name="{{ question.id }}" value="b" 
+                                           id="{{ question.id }}-b" class="option-input">
+                                    <label for="{{ question.id }}-b" class="option-label">
+                                        <span class="option-letter">B</span>
+                                        <span class="option-text">{{ question.b }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="option-card">
+                                    <input type="radio" name="{{ question.id }}" value="c" 
+                                           id="{{ question.id }}-c" class="option-input">
+                                    <label for="{{ question.id }}-c" class="option-label">
+                                        <span class="option-letter">C</span>
+                                        <span class="option-text">{{ question.c }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="option-card">
+                                    <input type="radio" name="{{ question.id }}" value="d" 
+                                           id="{{ question.id }}-d" class="option-input">
+                                    <label for="{{ question.id }}-d" class="option-label">
+                                        <span class="option-letter">D</span>
+                                        <span class="option-text">{{ question.d }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigatsiya tugmalari -->
+        <div class="navigation-buttons mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-outline-secondary btn-lg w-100" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left me-2"></i> Oldingi
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-primary btn-lg w-100" id="nextBtn">
+                        Keyingi <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn" style="display: none;">
+                        <i class="fas fa-paper-plane me-2"></i> Testni Yakunlash
+                    </button>
+                </div>
+            </div>
+        </div>
     </form>
+
+    <!-- Test qoidalari -->
+    <div class="test-rules card border-warning mt-4">
+        <div class="card-header bg-warning bg-opacity-10 border-warning">
+            <h6 class="mb-0 text-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i> Test Qoidalari
+            </h6>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-0">
+                <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Har bir savolga faqat bitta javob berishingiz mumkin
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Testni yakunlaganingizdan so'ng javoblarni o'zgartirib bo'lmaydi
+                </li>
+                <li class="mb-2">
+                    <i class="fas fa-check text-success me-2"></i>
+                    Testni vaqtida tugatishingiz kerak
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
+
+<style>
+/* Test header */
+.test-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+/* Progress bar */
+.progress-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+/* Savol kartasi */
+.question-card {
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Variant kartalari */
+.option-card {
+    position: relative;
+}
+
+.option-input {
+    display: none;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    min-height: 70px;
+}
+
+.option-label:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.option-input:checked + .option-label {
+    border-color: #007bff;
+    background: linear-gradient(135deg, #007bff15 0%, #0056b315 100%);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.2);
+}
+
+.option-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.option-input:checked + .option-label .option-letter {
+    background: #28a745;
+    box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+}
+
+.option-text {
+    font-size: 16px;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* Navigatsiya tugmalari */
+.navigation-buttons .btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.navigation-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Test qoidalari */
+.test-rules {
+    border-radius: 10px;
+}
+
+/* Responsive dizayn */
+@media (max-width: 768px) {
+    .test-header .card-body {
+        text-align: center;
+    }
+    
+    .option-label {
+        padding: 12px;
+        min-height: 60px;
+    }
+    
+    .option-letter {
+        width: 35px;
+        height: 35px;
+        margin-right: 12px;
+    }
+    
+    .navigation-buttons .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Animatsiyalar */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.question-card {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questions = document.querySelectorAll('.question-card');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('progressBar');
+    const currentQuestionSpan = document.getElementById('currentQuestion');
+    
+    let currentQuestion = 0;
+    const totalQuestions = questions.length;
+    
+    // Progress barni yangilash
+    function updateProgress() {
+        const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+        currentQuestionSpan.textContent = currentQuestion + 1;
+    }
+    
+    // Savollarni ko'rsatish/yashirish
+    function showQuestion(index) {
+        questions.forEach((question, i) => {
+            question.style.display = i === index ? 'block' : 'none';
+        });
+        
+        // Tugmalarni yangilash
+        prevBtn.style.display = index > 0 ? 'block' : 'none';
+        nextBtn.style.display = index < totalQuestions - 1 ? 'block' : 'none';
+        submitBtn.style.display = index === totalQuestions - 1 ? 'block' : 'none';
+        
+        updateProgress();
+        
+        // Sahifani yuqoriga scroll qilish
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Joriy savolga javob berilganligini tekshirish
+    function isCurrentQuestionAnswered() {
+        const currentQuestionElement = questions[currentQuestion];
+        const radioInputs = currentQuestionElement.querySelectorAll('input[type="radio"]');
+        
+        // Radio inputlardan birortasi tanlanganligini tekshiramiz
+        for (let input of radioInputs) {
+            if (input.checked) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Oldingi savol
+    prevBtn.addEventListener('click', function() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion(currentQuestion);
+        }
+    });
+    
+    // Keyingi savol
+    nextBtn.addEventListener('click', function() {
+        // Joriy savolga javob berilganligini tekshirish
+        if (!isCurrentQuestionAnswered()) {
+            alert('Iltimos, javob variantlaridan birini tanlang!');
+            return;
+        }
+        
+        if (currentQuestion < totalQuestions - 1) {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+    });
+    
+    // Form yuborish
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+        // Barcha savollarga javob berilganligini tekshirish
+        let unansweredQuestions = 0;
+        for (let i = 0; i < questions.length; i++) {
+            if (!isQuestionAnswered(i)) {
+                unansweredQuestions++;
+            }
+        }
+        
+        if (unansweredQuestions > 0) {
+            e.preventDefault();
+            const confirmSubmit = confirm(`${unansweredQuestions} ta savolga javob bermagansiz. Testni shu holatda yakunlamoqchimisiz?`);
+            if (!confirmSubmit) {
+                // Foydalanuvchi bekor qilsa, javob berilmagan birinchi savolga o'tamiz
+                for (let i = 0; i < questions.length; i++) {
+                    if (!isQuestionAnswered(i)) {
+                        currentQuestion = i;
+                        showQuestion(currentQuestion);
+                        break;
+                    }
+                }
+                return;
+            }
+        }
+        
+        // Yuklash animatsiyasi
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yuklanmoqda...';
+        submitBtn.disabled = true;
+        nextBtn.disabled = true;
+        prevBtn.disabled = true;
+    });
+    
+    // Berilgan indeksdagi savolga javob berilganligini tekshirish
+    function isQuestionAnswered(questionIndex) {
+        const questionElement = questions[questionIndex];
+        const radioInputs = questionElement.querySelectorAll('input[type="radio"]');
+        
+        for (let input of radioInputs) {
+            if (input.checked) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Dastlabki savolni ko'rsatish
+    showQuestion(currentQuestion);
+    
+    // Variant tanlanganda stil o'zgarishi
+    document.querySelectorAll('.option-input').forEach(input => {
+        input.addEventListener('change', function() {
+            // Barcha variantlardan active klassini olib tashlash (faqat joriy savolda)
+            const currentQuestionElement = questions[currentQuestion];
+            const allLabels = currentQuestionElement.querySelectorAll('.option-label');
+            allLabels.forEach(label => {
+                label.classList.remove('active');
+            });
+            
+            // Tanlangan variantga active klassini qo'shish
+            if (this.checked) {
+                this.nextElementSibling.classList.add('active');
+            }
+            
+            // Agar tanlangan bo'lsa, keyingi tugmasini faollashtirish
+            if (isCurrentQuestionAnswered()) {
+                nextBtn.classList.remove('btn-secondary');
+                nextBtn.classList.add('btn-primary');
+            }
+        });
+    });
+    
+    // Savol o'zgarganda variantlarni yangilash
+    function updateOptionStyles() {
+        const currentQuestionElement = questions[currentQuestion];
+        const radioInputs = currentQuestionElement.querySelectorAll('input[type="radio"]');
+        const allLabels = currentQuestionElement.querySelectorAll('.option-label');
+        
+        // Barcha label lardan active klassini olib tashlash
+        allLabels.forEach(label => {
+            label.classList.remove('active');
+        });
+        
+        // Tanlangan variantni topish va active qilish
+        for (let input of radioInputs) {
+            if (input.checked) {
+                input.nextElementSibling.classList.add('active');
+                break;
+            }
+        }
+        
+        // Keyingi tugma holatini yangilash
+        if (isCurrentQuestionAnswered()) {
+            nextBtn.classList.remove('btn-secondary');
+            nextBtn.classList.add('btn-primary');
+        } else {
+            nextBtn.classList.remove('btn-primary');
+            nextBtn.classList.add('btn-secondary');
+        }
+    }
+    
+    // Har safar savol o'zgarganda variant stillarini yangilash
+    const originalShowQuestion = showQuestion;
+    showQuestion = function(index) {
+        originalShowQuestion(index);
+        updateOptionStyles();
+    };
+});
+</script>
 {% endblock content %}

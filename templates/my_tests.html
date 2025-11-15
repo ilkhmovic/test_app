@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %} Mening Testlarim {% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mening Testlarim</h2>
+        <a href="{% url 'create_test' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yangi Test
+        </a>
+    </div>
+    
+    {% if user_tests %}
+        <div class="row">
+            {% for test in user_tests %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">{{ test.title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Kategoriya:</strong> {{ test.category.name }}<br>
+                            <strong>Savollar soni:</strong> {{ test.question_set.count }}<br>
+                            <strong>Urinishlar:</strong> {{ test.maximum_attempts }}<br>
+                            <strong>O'tish foizi:</strong> {{ test.pass_percentage }}%<br>
+                            <strong>Vaqt:</strong> {{ test.start_date|date:"d.m.Y H:i" }} - {{ test.end_date|date:"d.m.Y H:i" }}
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-primary btn-sm">
+                            Batafsil
+                        </a>
+                        <a href="{% url 'ready_to_test' test.id %}" class="btn btn-outline-success btn-sm">
+                            Testni ko'rish
+                        </a>
+                        <span class="badge bg-secondary float-end">
+                            {{ test.checktest_set.count }} ta topshirilgan
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="card">
+                <div class="card-body py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Hali test yaratilmagan</h4>
+                    <p class="text-muted">Birinchi testingizni yarating!</p>
+                    <a href="{% url 'create_test' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Yangi Test Yaratish
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

@@ -172,3 +172,39 @@ p {
     align-items: center;
     gap: 20px;
 }
+/* Profil sahifasi uchun qo'shimcha stillar */
+.card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+
+.list-group-item {
+    border: 1px solid #e9ecef;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+}
+
+/* User avatar */
+.rounded-circle {
+    border: 3px solid #007bff;
+}
