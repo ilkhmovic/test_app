@@ -24,12 +24,28 @@ def index(request):
 
 @login_required(login_url='login')
 def ready_to_test(request, test_id):
+    tests = Test.objects.all()
     test = get_object_or_404(Test, id=test_id)
-    return render(request, 'ready_to_test.html', {'test': test})
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
+    
+    context = {
+        'tests': tests,
+        'test': test,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
+    }
+    return render(request, 'ready_to_test.html', context)
 
 @login_required(login_url='login')
 def test(request, test_id):
+    tests = Test.objects.all()
     test = get_object_or_404(Test, id=test_id)
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     questions = Question.objects.filter(test=test)
     
     if request.method == "POST":
@@ -51,16 +67,28 @@ def test(request, test_id):
         checktest.calculate_results()
         return redirect('test_result', checktest_id=checktest.id)
     
-    context = {"test": test, "questions": questions}
+    context = {
+        "test": test, 
+        "questions": questions,
+        'tests': tests,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,}
     return render(request, "test.html", context)
 
 @login_required(login_url='login')
 def test_result(request, checktest_id):
     checktest = get_object_or_404(CheckTest, id=checktest_id, student=request.user)
     check_questions = CheckQuestion.objects.filter(checktest=checktest)
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     context = {
         'checktest': checktest,
-        'check_questions': check_questions
+        'check_questions': check_questions,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'test_result.html', context)
 
@@ -73,6 +101,10 @@ def profile(request, username):
     total_tests_created = user_tests.count()
     total_tests_taken = user_checktests.count()
     passed_tests = user_checktests.filter(user_passed=True).count()
+
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     
     context = {
         'profile_user': user,
@@ -82,6 +114,9 @@ def profile(request, username):
         'total_tests_taken': total_tests_taken,
         'passed_tests': passed_tests,
         'success_rate': (passed_tests * 100 // total_tests_taken) if total_tests_taken > 0 else 0,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'profile.html', context)
 
@@ -89,6 +124,10 @@ def profile(request, username):
 def create_test(request):
     # Boshlang'ich 1 ta savol bilan boshlaymiz
     QuestionFormSet = formset_factory(QuestionForm, extra=1)
+
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     
     if request.method == 'POST':
         test_form = TestForm(request.POST)
@@ -126,6 +165,9 @@ def create_test(request):
     context = {
         'test_form': test_form,
         'question_formset': question_formset,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'create_test.html', context)
 
@@ -194,18 +236,30 @@ def add_question_field(request):
 def test_detail(request, test_id):
     test = get_object_or_404(Test, id=test_id, author=request.user)
     questions = Question.objects.filter(test=test)
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     
     context = {
         'test': test,
         'questions': questions,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'test_detail.html', context)
 
 @login_required(login_url='login')
 def my_tests(request):
     user_tests = Test.objects.filter(author=request.user).order_by('-id')
+    total_tests_count = Test.objects.count()
+    active_users_count = User.objects.filter(is_active=True).count()
+    completed_tests_count = CheckTest.objects.count()
     
     context = {
         'user_tests': user_tests,
+        'total_tests_count': total_tests_count,
+        'active_users_count': active_users_count,
+        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'my_tests.html', context)
