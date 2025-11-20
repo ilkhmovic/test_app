@@ -13,10 +13,12 @@ class CategoryAdmin(admin.ModelAdmin):
 class TestAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]  # QuestionInline dan foydalanish
     list_display = ['title', 'author', 'category', 'start_date', 'end_date']
+    search_fields = ['title', 'author__username', 'category__name']
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ['question', 'test', 'true_answer']
+    search_fields = ['question', 'test__title']
 
 @admin.register(CheckTest)
 class CheckTestAdmin(admin.ModelAdmin):

@@ -1,20 +1,104 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block title %} Signup {% endblock title %}
+{% block title %} Ro'yxatdan o'tish {% endblock title %}
+
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <h2 class="mb-4">Sign Up</h2>
-            <form method="post">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="btn btn-primary btn-signup mt-3">Sign Up</button>
-                <small class="login-link">
-                    Allaqachon akkauntingiz bormi? <a href="{% url 'login' %}">Login</a>
-                </small>
-            </form>
+    <div class="row justify-content-center m-5 align-items-center min-vh-50">
+        <div class="col-md-6 col-lg-5 ">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header  bg-primary text-white text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Yangi Hisob Yaratish
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            {{ field|as_crispy_field }}
+                        </div>
+                        {% endfor %}
+                        
+                        <button type="submit" class="btn btn-success w-100 py-2 mb-3">
+                            <i class="fas fa-check-circle me-2"></i> Ro'yxatdan o'tish
+                        </button>
+                        
+                        <div class="text-center">
+                            <small class="text-muted">
+                                Hisobingiz bormi? 
+                                <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Tizimga kirish</a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.login-card {
+    border: none;
+    border-radius: 15px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-login {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Form elementlarini yaxshilash */
+.form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Responsive dizayn */
+@media (max-width: 768px) {
+    .col-md-6 {
+        margin: 0 15px;
+    }
+    
+    .login-card {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+}
+
+/* Orqa fon uchun */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+</style>
 {% endblock content %}

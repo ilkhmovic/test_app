@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %} Savol Qo'shish - {{ test.title }} {% endblock title %}
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    {{ test.title }} - Yangi Savol Qo'shish
+                </h3>
+                <span class="badge bg-light text-dark">{{ test.question_set.count }} savol</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="post" id="questionForm">
+                {% csrf_token %}
+                
+                <!-- Savol matni -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Savol Matni</label>
+                    <textarea name="question" class="form-control" rows="4" 
+                              placeholder="Savol matnini kiriting..." required
+                              style="border-radius: 10px; border: 2px solid #e9ecef;" id="questionInput"></textarea>
+                </div>
+                
+                <!-- Variantlar -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-success">A Variant</label>
+                        <input type="text" name="a" class="form-control" placeholder="A variant matni" required
+                               id="aInput">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-success">B Variant</label>
+                        <input type="text" name="b" class="form-control" placeholder="B variant matni" required
+                               id="bInput">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-success">C Variant</label>
+                        <input type="text" name="c" class="form-control" placeholder="C variant matni" required
+                               id="cInput">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-success">D Variant</label>
+                        <input type="text" name="d" class="form-control" placeholder="D variant matni" required
+                               id="dInput">
+                    </div>
+                </div>
+                
+                <!-- To'g'ri javob -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-danger">To'g'ri Javob</label>
+                        <select name="true_answer" class="form-control" required id="trueAnswerSelect">
+                            <option value="">To'g'ri javobni tanlang</option>
+                            <option value="a">A variant</option>
+                            <option value="b">B variant</option>
+                            <option value="c">C variant</option>
+                            <option value="d">D variant</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Tugmalar -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-success btn-lg" id="saveBtn">
+                            <i class="fas fa-save me-2"></i> Savolni Saqlash
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-lg" id="saveAndNewBtn">
+                            <i class="fas fa-plus me-2"></i> Saqlab va Yangi Qo'shish
+                        </button>
+                        <a href="{% url 'mass_create_questions' test.id %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i> Orqaga
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('questionForm');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveAndNewBtn = document.getElementById('saveAndNewBtn');
+    const questionInput = document.getElementById('questionInput');
+    const aInput = document.getElementById('aInput');
+    const bInput = document.getElementById('bInput');
+    const cInput = document.getElementById('cInput');
+    const dInput = document.getElementById('dInput');
+    const trueAnswerSelect = document.getElementById('trueAnswerSelect');
+    
+    let saveAndNew = false;
+    
+    // "Saqlab va Yangi Qo'shish" tugmasi
+    saveAndNewBtn.addEventListener('click', function() {
+        if (validateForm()) {
+            saveAndNew = true;
+            setLoadingState(true);
+            
+            // Form ma'lumotlarini yuborish
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Formni tozalash
+                    clearForm();
+                    setLoadingState(false);
+                    saveAndNew = false;
+                    
+                    // Xabar ko'rsatish
+                    showMessage('Savol muvaffaqiyatli saqlandi! Yangi savol qo\'shishingiz mumkin.', 'success');
+                } else {
+                    throw new Error('Server xatosi');
+                }
+            })
+            .catch(error => {
+                setLoadingState(false);
+                saveAndNew = false;
+                showMessage('Xatolik yuz berdi: ' + error.message, 'error');
+            });
+        }
+    });
+    
+    // Oddiy saqlash
+    form.addEventListener('submit', function(e) {
+        if (!saveAndNew) {
+            setLoadingState(true);
+            // Oddiy saqlash - form normal tarzda yuboriladi
+        } else {
+            e.preventDefault();
+        }
+    });
+    
+    // Formni tekshirish
+    function validateForm() {
+        const inputs = [questionInput, aInput, bInput, cInput, dInput, trueAnswerSelect];
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                input.style.borderColor = '';
+            }
+        });
+        
+        if (!isValid) {
+            showMessage('Iltimos, barcha maydonlarni to\'ldiring!', 'error');
+        }
+        
+        return isValid;
+    }
+    
+    // Formni tozalash
+    function clearForm() {
+        questionInput.value = '';
+        aInput.value = '';
+        bInput.value = '';
+        cInput.value = '';
+        dInput.value = '';
+        trueAnswerSelect.value = '';
+        
+        // Fokusni savol maydoniga qaytarish
+        questionInput.focus();
+    }
+    
+    // Yuklash holatini o'rnatish
+    function setLoadingState(loading) {
+        if (loading) {
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saqlanmoqda...';
+            saveBtn.disabled = true;
+            saveAndNewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saqlanmoqda...';
+            saveAndNewBtn.disabled = true;
+        } else {
+            saveBtn.innerHTML = '<i class="fas fa-save me-2"></i> Savolni Saqlash';
+            saveBtn.disabled = false;
+            saveAndNewBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Saqlab va Yangi Qo\'shish';
+            saveAndNewBtn.disabled = false;
+        }
+    }
+    
+    // Xabar ko'rsatish
+    function showMessage(message, type) {
+        // Mavjud xabarlarni olib tashlash
+        const existingAlerts = document.querySelectorAll('.custom-alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show custom-alert`;
+        alertDiv.innerHTML = `
+            <i class="fas ${icon} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        form.parentNode.insertBefore(alertDiv, form);
+        
+        // 3 soniyadan so'ng xabarni olib tashlash
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 3000);
+    }
+    
+    // Input lardagi border rangini tiklash
+    const inputs = [questionInput, aInput, bInput, cInput, dInput, trueAnswerSelect];
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.style.borderColor = '';
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.btn-lg {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.custom-alert {
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}

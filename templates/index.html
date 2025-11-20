@@ -191,23 +191,52 @@
         </div>
         
         <!-- Pagination -->
+        <!-- Pagination -->
+        {% if tests.has_other_pages %}
         <div class="row mt-5">
             <div class="col-12">
                 <nav aria-label="Testlar navigatsiyasi">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Oldingi</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        {% if tests.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="#">Keyingi</a>
+                            <a class="page-link" href="?page={{ tests.previous_page_number }}" aria-label="Oldingi">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
                         </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                        {% endif %}
+
+                        {% for i in tests.paginator.page_range %}
+                            {% if tests.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if tests.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ tests.next_page_number }}" aria-label="Keyingi">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
         </div>
+        {% endif %}
         {% else %}
         <div class="text-center py-5">
             <div class="empty-state">

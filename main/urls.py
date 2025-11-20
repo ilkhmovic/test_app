@@ -13,4 +13,8 @@ urlpatterns = [
     path('add-question-field/', views.add_question_field, name='add_question_field'), # <- QO'SHING
     path('my-tests/', views.my_tests, name='my_tests'),  # <- QO'SHING
     path('test/<int:test_id>/detail/', views.test_detail, name='test_detail'),  # <- QO'SHING
+    path('test/<int:test_id>/import-questions/', views.import_questions, name='import_questions'),
+    path('test/<int:test_id>/parse-questions/', views.parse_questions, name='parse_questions'),
+    path('test/<int:test_id>/mass-create/', views.mass_create_questions, name='mass_create_questions'),
+    path('test/<int:test_id>/add-question/', views.add_question, name='add_question'),
 ]

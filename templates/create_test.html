@@ -2,273 +2,575 @@
 {% load static %}
 {% block title %} Yangi Test Yaratish {% endblock title %}
 {% block content %}
-<div class="container mt-4">
+<div class="container py-4">
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Yangi Test Yaratish</h3>
+            <h3 class="mb-0">
+                <i class="fas fa-plus-circle me-2"></i>
+                Yangi Test Yaratish
+            </h3>
         </div>
         <div class="card-body">
-            <form method="post" id="testForm">
-                {% csrf_token %}
-                
-                <!-- Test ma'lumotlari -->
-                <h5 class="mb-3">Test Ma'lumotlari</h5>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Test Nomi</label>
-                        {{ test_form.title }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Kategoriya</label>
-                        {{ test_form.category }}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Maksimal Urinishlar</label>
-                        {{ test_form.maximum_attempts }}
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">O'tish Foizi (%)</label>
-                        {{ test_form.pass_percentage }}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Boshlanish Sanasi</label>
-                        {{ test_form.start_date }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tugash Sanasi</label>
-                        {{ test_form.end_date }}
-                    </div>
-                </div>
-                
-                <hr class="my-4">
-                
-                <!-- Savollar -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Savollar</h5>
-                    <button type="button" id="addQuestion" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Yangi Savol
+            <!-- Tab Navigatsiya -->
+            <ul class="nav nav-pills mb-4" id="createTestTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="pill" data-bs-target="#basic" type="button">
+                        <i class="fas fa-info-circle me-1"></i> Test Ma'lumotlari
                     </button>
-                </div>
-                
-                <div id="questions-container">
-                    {{ question_formset.management_form }}
-                    
-                    {% for form in question_formset %}
-                    <div class="question-form card mb-3" id="question-{{ forloop.counter0 }}">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">Savol {{ forloop.counter }}</h6>
-                            {% if forloop.counter0 > 0 or question_formset|length > 1 %}
-                            <button type="button" class="btn btn-danger btn-sm remove-question" data-index="{{ forloop.counter0 }}">
-                                <i class="fas fa-times"></i> O'chirish
-                            </button>
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Savol Matni</label>
-                                {{ form.question }}
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label">A Variant</label>
-                                    {{ form.a }}
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label">B Variant</label>
-                                    {{ form.b }}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label">C Variant</label>
-                                    {{ form.c }}
-                                </div>
-                                <div class="col-md-6 mb-2">
-                                    <label class="form-label">D Variant</label>
-                                    {{ form.d }}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">To'g'ri Javob</label>
-                                    {{ form.true_answer }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="fas fa-save"></i> Testni Saqlash
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="manual-tab" data-bs-toggle="pill" data-bs-target="#manual" type="button">
+                        <i class="fas fa-keyboard me-1"></i> Qo'lda Kiritish
                     </button>
-                    <a href="{% url 'index' %}" class="btn btn-outline-secondary">Bekor qilish</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="import-tab" data-bs-toggle="pill" data-bs-target="#import" type="button">
+                        <i class="fas fa-file-import me-1"></i> Fayldan Import
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="text-tab" data-bs-toggle="pill" data-bs-target="#text" type="button">
+                        <i class="fas fa-font me-1"></i> Matndan Import
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Kontent -->
+            <div class="tab-content" id="createTestTabContent">
+                
+                <!-- 1. Test Ma'lumotlari -->
+                <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                    <div class="test-basic-info">
+                        <h5 class="mb-4 text-primary">
+                            <i class="fas fa-info-circle me-2"></i>Test Asosiy Ma'lumotlari
+                        </h5>
+                        
+                        <form method="post" id="basicForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="method" value="basic">
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Test Nomi</label>
+                                    <input type="text" name="title" class="form-control" placeholder="Test nomini kiriting" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Kategoriya</label>
+                                    <select name="category" class="form-control" required>
+                                        <option value="">Kategoriyani tanlang</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Urinishlar soni</label>
+                                    <input type="number" name="maximum_attempts" class="form-control" min="1" value="3" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">O'tish foizi (%)</label>
+                                    <input type="number" name="pass_percentage" class="form-control" min="0" max="100" value="60" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Muddati (kun)</label>
+                                    <input type="number" name="days_duration" class="form-control" min="1" max="365" value="10" required>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-arrow-right me-2"></i> Keyingi Qadam
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </form>
+
+                <!-- 2. Qo'lda Kiritish -->
+                <div class="tab-pane fade" id="manual" role="tabpanel">
+                    <div class="manual-questions-section">
+                        <h5 class="mb-4 text-primary">
+                            <i class="fas fa-keyboard me-2"></i>Qo'lda Savol Kiritish
+                        </h5>
+
+                        <form method="post" id="manualForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="method" value="manual">
+                            
+                            <!-- Test ma'lumotlari (yashirin) -->
+                            <div id="manualTestInfo" class="mb-4 p-3 bg-light rounded">
+                                <h6 class="text-muted">Test ma'lumotlari</h6>
+                                <!-- JavaScript bilan to'ldiriladi -->
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">
+                                    Savollar
+                                    <span class="badge bg-primary ms-2" id="manualQuestionsCount">0</span>
+                                </h6>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="addManualQuestion()">
+                                        <i class="fas fa-plus me-1"></i> Yangi Savol
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" onclick="addMultipleManualQuestions(3)">
+                                        +3 ta
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="manual-questions-container" class="mb-4">
+                                <!-- Qo'lda kiritiladigan savollar shu yerda -->
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-2"></i> Testni Yaratish
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-lg" onclick="previewManualTest()">
+                                    <i class="fas fa-eye me-2"></i> Ko'rib Chiqish
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 3. Fayldan Import -->
+                <div class="tab-pane fade" id="import" role="tabpanel">
+                    <div class="import-section">
+                        <h5 class="mb-4 text-primary">
+                            <i class="fas fa-file-import me-2"></i>Fayldan Import Qilish
+                        </h5>
+
+                        <form method="post" id="importForm" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="method" value="import">
+                            
+                            <!-- Test ma'lumotlari (yashirin) -->
+                            <div id="importTestInfo" class="mb-4 p-3 bg-light rounded">
+                                <h6 class="text-muted">Test ma'lumotlari</h6>
+                                <!-- JavaScript bilan to'ldiriladi -->
+                            </div>
+
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Fayl tanlang</label>
+                                        <input type="file" name="import_file" class="form-control" 
+                                               accept=".csv,.xlsx,.xls" required id="importFile">
+                                        <div class="form-text">
+                                            CSV, XLSX yoki XLS formatidagi faylni tanlang
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h6>Fayl formati:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>question</th>
+                                                        <th>a</th>
+                                                        <th>b</th>
+                                                        <th>c</th>
+                                                        <th>d</th>
+                                                        <th>true_answer</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Savol matni?</td>
+                                                        <td>A variant</td>
+                                                        <td>B variant</td>
+                                                        <td>C variant</td>
+                                                        <td>D variant</td>
+                                                        <td>a</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <a href="{% static 'samples/questions_template.csv' %}" class="btn btn-outline-success btn-sm" 
+                                       download="savollar_namuna.csv">
+                                        <i class="fas fa-download me-1"></i> Namuna CSV yuklab olish
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-2"></i> Testni Yaratish
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 4. Matndan Import -->
+                <div class="tab-pane fade" id="text" role="tabpanel">
+                    <div class="text-import-section">
+                        <h5 class="mb-4 text-primary">
+                            <i class="fas fa-font me-2"></i>Matndan Import Qilish
+                        </h5>
+
+                        <form method="post" id="textForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="method" value="text">
+                            
+                            <!-- Test ma'lumotlari (yashirin) -->
+                            <div id="textTestInfo" class="mb-4 p-3 bg-light rounded">
+                                <h6 class="text-muted">Test ma'lumotlari</h6>
+                                <!-- JavaScript bilan to'ldiriladi -->
+                            </div>
+
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Savollar matni</label>
+                                        <textarea name="questions_text" class="form-control" rows="12" 
+                                                  placeholder="Savollarni quyidagi formatda kiriting..." required></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h6>Namuna format:</h6>
+                                        <pre class="bg-light p-3 rounded small">
+1. Savol matni?
+A) Birinchi variant
+B) Ikkinchi variant
+C) Uchinchi variant
+D) To'rtinchi variant
+Javob: A
+
+2. Ikkinchi savol?
+A) Variant 1
+B) Variant 2
+C) Variant 3
+D) Variant 4
+Javob: C
+
+3. Fizika faniga oid savol?
+A) Birinchi javob
+B) Ikkinchi javob  
+C) Uchinchi javob
+D) To'rtinchi javob
+Javob: B
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-2"></i> Testni Yaratish
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<br>
-<br>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Oddiy usul - har doim 1 dan boshlaymiz
-    let questionCount = 1;
-    
-    const questionsContainer = document.getElementById('questions-container');
-    const addButton = document.getElementById('addQuestion');
-    const totalForms = document.getElementById('id_questions-TOTAL_FORMS');
-    
-    console.log('Test yaratish sahifasi yuklandi');
-    
-    // Yangi savol qo'shish
-    addButton.addEventListener('click', function() {
-        console.log('Yangi savol qo\'shilmoqda...');
-        
-        // Yangi savol HTML ni yaratamiz
-        const newQuestionHTML = `
-        <div class="question-form card mb-3" id="question-${questionCount}">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">Savol ${questionCount + 1}</h6>
-                <button type="button" class="btn btn-danger btn-sm remove-question" data-index="${questionCount}">
-                    <i class="fas fa-times"></i> O'chirish
-                </button>
+<!-- Qo'lda Savol Shabloni -->
+<template id="manualQuestionTemplate">
+    <div class="manual-question-card card border-primary mb-3">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 text-primary">
+                <i class="fas fa-question-circle me-2"></i>
+                Savol <span class="manual-question-number">1</span>
+            </h6>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeManualQuestion(this)">
+                <i class="fas fa-times"></i> O'chirish
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Savol Matni</label>
+                <textarea name="manual_questions[]" class="form-control" rows="3" 
+                          placeholder="Savol matnini kiriting..." required></textarea>
             </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">Savol Matni</label>
-                    <textarea name="questions-${questionCount}-question" class="form-control" rows="2" placeholder="Savol matnini kiriting"></textarea>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">A Variant</label>
-                        <input type="text" name="questions-${questionCount}-a" class="form-control" placeholder="A variant">
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">B Variant</label>
-                        <input type="text" name="questions-${questionCount}-b" class="form-control" placeholder="B variant">
+            
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-success text-white fw-bold">A</span>
+                        <input type="text" name="manual_a[]" class="form-control" placeholder="A variant" required>
                     </div>
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">C Variant</label>
-                        <input type="text" name="questions-${questionCount}-c" class="form-control" placeholder="C variant">
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">D Variant</label>
-                        <input type="text" name="questions-${questionCount}-d" class="form-control" placeholder="D variant">
+                <div class="col-md-6">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-success text-white fw-bold">B</span>
+                        <input type="text" name="manual_b[]" class="form-control" placeholder="B variant" required>
                     </div>
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <label class="form-label">To'g'ri Javob</label>
-                        <select name="questions-${questionCount}-true_answer" class="form-control">
-                            <option value="">To'g'ri javobni tanlang</option>
-                            <option value="a">A variant</option>
-                            <option value="b">B variant</option>
-                            <option value="c">C variant</option>
-                            <option value="d">D variant</option>
-                        </select>
+                <div class="col-md-6">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-success text-white fw-bold">C</span>
+                        <input type="text" name="manual_c[]" class="form-control" placeholder="C variant" required>
                     </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-success text-white fw-bold">D</span>
+                        <input type="text" name="manual_d[]" class="form-control" placeholder="D variant" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-danger">To'g'ri Javob</label>
+                    <select name="manual_true_answer[]" class="form-control" required>
+                        <option value="">Tanlang</option>
+                        <option value="a">A variant</option>
+                        <option value="b">B variant</option>
+                        <option value="c">C variant</option>
+                        <option value="d">D variant</option>
+                    </select>
                 </div>
             </div>
         </div>
-        `;
+    </div>
+</template>
+
+<script>
+let manualQuestionCounter = 0;
+let testData = {};
+
+// Asosiy form yuborilganda
+document.getElementById('basicForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Ma'lumotlarni yig'ish
+    const formData = new FormData(this);
+    testData = {
+        title: formData.get('title'),
+        category: formData.get('category'),
+        maximum_attempts: formData.get('maximum_attempts'),
+        pass_percentage: formData.get('pass_percentage'),
+        days_duration: formData.get('days_duration')
+    };
+    
+    // Test ma'lumotlarini ko'rsatish
+    updateTestInfo();
+    
+    // Keyingi tab ga o'tish
+    const manualTab = new bootstrap.Tab(document.getElementById('manual-tab'));
+    manualTab.show();
+});
+
+// Test ma'lumotlarini yangilash
+function updateTestInfo() {
+    const testInfoHTML = `
+        <strong>${testData.title}</strong> | 
+        Urinishlar: ${testData.maximum_attempts} | 
+        O'tish: ${testData.pass_percentage}% |
+        Muddati: ${testData.days_duration} kun
+    `;
+    
+    document.getElementById('manualTestInfo').innerHTML = testInfoHTML;
+    document.getElementById('importTestInfo').innerHTML = testInfoHTML;
+    document.getElementById('textTestInfo').innerHTML = testInfoHTML;
+}
+
+// Qo'lda savol qo'shish
+function addManualQuestion() {
+    const template = document.getElementById('manualQuestionTemplate');
+    const container = document.getElementById('manual-questions-container');
+    
+    manualQuestionCounter++;
+    
+    const questionHTML = template.innerHTML.replace(/manual-question-number">\d+/g, `manual-question-number">${manualQuestionCounter}`);
+    
+    const questionElement = document.createElement('div');
+    questionElement.innerHTML = questionHTML;
+    container.appendChild(questionElement);
+    
+    updateManualQuestionsCount();
+}
+
+// Bir nechta savol qo'shish
+function addMultipleManualQuestions(count) {
+    for (let i = 0; i < count; i++) {
+        addManualQuestion();
+    }
+}
+
+// Qo'lda savolni o'chirish
+function removeManualQuestion(button) {
+    const questionCard = button.closest('.manual-question-card');
+    const questions = document.querySelectorAll('.manual-question-card');
+    
+    if (questions.length > 1) {
+        questionCard.remove();
+        updateManualQuestionsCount();
+        renumberManualQuestions();
+    } else {
+        alert('Kamida bitta savol bo\'lishi kerak!');
+    }
+}
+
+// Qo'lda savollarni qayta raqamlash
+function renumberManualQuestions() {
+    const questions = document.querySelectorAll('.manual-question-card');
+    questions.forEach((question, index) => {
+        const numberElement = question.querySelector('.manual-question-number');
+        numberElement.textContent = index + 1;
+    });
+    manualQuestionCounter = questions.length;
+}
+
+// Qo'lda savollar sonini yangilash
+function updateManualQuestionsCount() {
+    const countElement = document.getElementById('manualQuestionsCount');
+    const questions = document.querySelectorAll('.manual-question-card');
+    countElement.textContent = questions.length;
+}
+
+// Ko'rib chiqish
+function previewManualTest() {
+    const questions = document.querySelectorAll('.manual-question-card');
+    
+    if (questions.length === 0) {
+        alert('Iltimos, savol qo\'shing!');
+        return;
+    }
+    
+    let previewText = `Test: ${testData.title}\n\n`;
+    
+    questions.forEach((question, index) => {
+        const questionText = question.querySelector('textarea').value || `Savol ${index + 1}`;
+        const variantA = question.querySelector('input[name="manual_a[]"]').value || 'A variant';
+        const variantB = question.querySelector('input[name="manual_b[]"]').value || 'B variant';
+        const variantC = question.querySelector('input[name="manual_c[]"]').value || 'C variant';
+        const variantD = question.querySelector('input[name="manual_d[]"]').value || 'D variant';
+        const trueAnswer = question.querySelector('select[name="manual_true_answer[]"]').value || 'tanlanmagan';
         
-        // Yangi savolni qo'shamiz
-        questionsContainer.insertAdjacentHTML('beforeend', newQuestionHTML);
-        questionCount++;
-        
-        // TOTAL_FORMS qiymatini yangilaymiz
-        if (totalForms) {
-            totalForms.value = questionCount;
-            console.log('Yangi savollar soni:', totalForms.value);
-        }
-        
-        console.log('Yangi savol qo\'shildi');
+        previewText += `${index + 1}. ${questionText}\n`;
+        previewText += `   A) ${variantA}\n`;
+        previewText += `   B) ${variantB}\n`;
+        previewText += `   C) ${variantC}\n`;
+        previewText += `   D) ${variantD}\n`;
+        previewText += `   To'g'ri javob: ${trueAnswer.toUpperCase()}\n\n`;
     });
     
-    // Savolni o'chirish
-    questionsContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-question') || e.target.closest('.remove-question')) {
-            const button = e.target.classList.contains('remove-question') ? 
-                e.target : e.target.closest('.remove-question');
-            const index = button.getAttribute('data-index');
-            
-            console.log('Savol o\'chirilmoqda:', index);
-            
-            const questionElement = document.getElementById(`question-${index}`);
-            
-            if (questionElement && questionCount > 1) {
-                questionElement.remove();
-                questionCount--;
-                
-                // TOTAL_FORMS qiymatini yangilaymiz
-                if (totalForms) {
-                    totalForms.value = questionCount;
-                }
-                
-                console.log('Savol o\'chirildi. Yangi son:', questionCount);
-                
-                // Barcha savollarni qayta raqamlash
-                const allQuestions = questionsContainer.querySelectorAll('.question-form');
-                allQuestions.forEach((question, newIndex) => {
-                    question.id = `question-${newIndex}`;
-                    const header = question.querySelector('.card-header h6');
-                    const removeBtn = question.querySelector('.remove-question');
-                    
-                    if (header) header.textContent = `Savol ${newIndex + 1}`;
-                    if (removeBtn) removeBtn.setAttribute('data-index', newIndex);
-                });
-            } else {
-                alert('Kamida bitta savol bo\'lishi kerak!');
-            }
+    alert(previewText);
+}
+
+// Form yuborishda test ma'lumotlarini qo'shish
+document.getElementById('manualForm').addEventListener('submit', function(e) {
+    if (!validateTestData()) {
+        e.preventDefault();
+        return;
+    }
+    
+    // Test ma'lumotlarini formga qo'shish
+    addTestDataToForm(this);
+});
+
+document.getElementById('importForm').addEventListener('submit', function(e) {
+    if (!validateTestData()) {
+        e.preventDefault();
+        return;
+    }
+    
+    addTestDataToForm(this);
+});
+
+document.getElementById('textForm').addEventListener('submit', function(e) {
+    if (!validateTestData()) {
+        e.preventDefault();
+        return;
+    }
+    
+    addTestDataToForm(this);
+});
+
+// Test ma'lumotlarini tekshirish
+function validateTestData() {
+    if (!testData.title) {
+        alert('Iltimos, avval test ma\'lumotlarini to\'ldiring!');
+        const basicTab = new bootstrap.Tab(document.getElementById('basic-tab'));
+        basicTab.show();
+        return false;
+    }
+    return true;
+}
+
+// Test ma'lumotlarini formga qo'shish
+function addTestDataToForm(form) {
+    const hiddenInputs = [
+        { name: 'title', value: testData.title },
+        { name: 'category', value: testData.category },
+        { name: 'maximum_attempts', value: testData.maximum_attempts },
+        { name: 'pass_percentage', value: testData.pass_percentage },
+        { name: 'days_duration', value: testData.days_duration }
+    ];
+    
+    hiddenInputs.forEach(input => {
+        let hiddenInput = form.querySelector(`input[name="${input.name}"]`);
+        if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = input.name;
+            form.appendChild(hiddenInput);
         }
+        hiddenInput.value = input.value;
     });
+}
+
+// Dastlabki savolni qo'shish
+document.addEventListener('DOMContentLoaded', function() {
+    addManualQuestion(); // Birinchi savolni avtomatik qo'shish
 });
 </script>
 
 <style>
-.question-form {
-    border: 2px dashed #e9ecef;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+.nav-pills .nav-link {
+    border-radius: 8px;
+    margin-right: 5px;
+    font-weight: 500;
 }
 
-.question-form:hover {
-    border-color: #007bff;
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
 .card {
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+}
+
+.manual-question-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.manual-question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    min-width: 40px;
+    justify-content: center;
 }
 
 .btn-lg {
-    padding: 12px 30px;
-    font-size: 18px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
-.form-label {
-    font-weight: 500;
-    margin-bottom: 5px;
-}
-
-#addQuestion {
-    padding: 8px 16px;
+pre {
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
 }
 </style>
 {% endblock %}

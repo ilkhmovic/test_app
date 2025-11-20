@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Savollar Qo'shish - {{ test.title }} {% endblock title %}
+{% block content %}
+<div class="container py-4">
+    <!-- Xabarlarni ko'rsatish -->
+    {% if success_message %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        {{ success_message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+    
+    {% if error_message %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ error_message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        
+        {% if error_details %}
+        <div class="mt-2">
+            <small>
+                <strong>Xatolik tafsilotlari:</strong>
+                <ul class="mb-0 mt-1">
+                    {% for detail in error_details %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </small>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="fas fa-bulk me-2"></i>
+                {{ test.title }} - Savollar Qo'shish
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Excel/CSV Import -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-import me-2"></i>
+                                Excel/CSV dan Import
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                Excel yoki CSV fayldan savollarni import qiling.
+                            </p>
+                            
+                            <div class="mb-3">
+                                <h6>Fayl formati:</h6>
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>question</th>
+                                            <th>a</th>
+                                            <th>b</th>
+                                            <th>c</th>
+                                            <th>d</th>
+                                            <th>true_answer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Savol matni?</td>
+                                            <td>A variant</td>
+                                            <td>B variant</td>
+                                            <td>C variant</td>
+                                            <td>D variant</td>
+                                            <td>a</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <form method="post" action="{% url 'import_questions' test.id %}" enctype="multipart/form-data" id="importForm">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Fayl tanlang</label>
+                                    <input type="file" name="questions_file" class="form-control" 
+                                           accept=".csv,.xlsx,.xls" required id="fileInput">
+                                    <div class="form-text">
+                                        CSV, XLSX yoki XLS formatidagi faylni tanlang
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100" id="importBtn">
+                                    <i class="fas fa-upload me-2"></i> Import Qilish
+                                </button>
+                            </form>
+                            
+                            <div class="mt-3">
+                                <a href="{% static 'samples/questions_template.csv' %}" class="btn btn-outline-secondary btn-sm w-100" 
+                                   download="savollar_namuna.csv">
+                                    <i class="fas fa-download me-1"></i> Namuna CSV yuklab olish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Matndan Yarating -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-info h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-keyboard me-2"></i>
+                                Matndan Yarating
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                Matn formatida savollarni kiriting.
+                            </p>
+                            
+                            <div class="bg-light p-3 rounded small mb-3">
+                                <strong>Namuna format:</strong><br>
+                                1. Savol matni?<br>
+                                A) Birinchi variant<br>
+                                B) Ikkinchi variant<br>
+                                C) Uchinchi variant<br>
+                                D) To'rtinchi variant<br>
+                                Javob: A
+                            </div>
+                            
+                            <form method="post" action="{% url 'parse_questions' test.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Savollar matni</label>
+                                    <textarea name="questions_text" class="form-control" rows="6" 
+                                              placeholder="Savollarni yuqoridagi formatda kiriting..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-info text-white w-100">
+                                    <i class="fas fa-magic me-2"></i> Savollarni Yarating
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Oddiy qo'shish -->
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Birma-bir Qo'shish
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Har bir savolni alohida qo'shish
+                    </p>
+                    <a href="{% url 'add_question' test.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> Yangi Savol Qo'shish
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Test Sahifasiga Qaytish
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fayl yuklashni boshqarish
+document.addEventListener('DOMContentLoaded', function() {
+    const importForm = document.getElementById('importForm');
+    const fileInput = document.getElementById('fileInput');
+    const importBtn = document.getElementById('importBtn');
+    
+    if (importForm) {
+        importForm.addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            if (!file) {
+                e.preventDefault();
+                alert('Iltimos, fayl tanlang!');
+                return;
+            }
+            
+            // Fayl hajmini tekshirish (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                e.preventDefault();
+                alert('Fayl hajmi 10MB dan kichik bo\'lishi kerak!');
+                return;
+            }
+            
+            // Yuklash animatsiyasi
+            importBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yuklanmoqda...';
+            importBtn.disabled = true;
+        });
+    }
+});
+</script>
+
+<style>
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.table-sm th, .table-sm td {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}
