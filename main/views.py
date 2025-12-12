@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Test, Question, CheckQuestion, CheckTest, Category
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from .forms import TestForm, QuestionForm
 from django.forms import formset_factory
 from django.http import JsonResponse
@@ -16,10 +17,17 @@ from django.core.files.storage import FileSystemStorage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from test_app import settings
 
+def signup(request):
+    form = UserCreationForm()
+    if request.method == 'POST':
+        form = UserCreationForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    return render(request, 'registration/signup.html', {'form': form})
+
 def index(request):
-    tests_list = Test.objects.all().order_by('-id')  # -id bo'lishi kerak
-    
-    # Paginator
+    tests_list = Test.objects.all().order_by('-id')  
     page = request.GET.get('page', 1)
     paginator = Paginator(tests_list, getattr(settings, 'TESTS_PER_PAGE', 6))
     
@@ -149,18 +157,15 @@ def create_test(request):
         method = request.POST.get('method', 'basic')
         
         try:
-            # Test ma'lumotlarini olish
             title = request.POST.get('title')
             category_id = request.POST.get('category')
             maximum_attempts = request.POST.get('maximum_attempts')
             pass_percentage = request.POST.get('pass_percentage')
             days_duration = request.POST.get('days_duration', 10)
             
-            # Sanalarni hisoblash
             start_date = timezone.now()
             end_date = start_date + datetime.timedelta(days=int(days_duration))
             
-            # Testni yaratish
             test = Test.objects.create(
                 title=title,
                 category_id=category_id,
@@ -174,7 +179,6 @@ def create_test(request):
             saved_questions = 0
             
             if method == 'manual':
-                # Qo'lda kiritilgan savollarni saqlash
                 manual_questions = request.POST.getlist('manual_questions[]')
                 manual_a = request.POST.getlist('manual_a[]')
                 manual_b = request.POST.getlist('manual_b[]')
@@ -196,14 +200,12 @@ def create_test(request):
                         saved_questions += 1
             
             elif method == 'import':
-                # Fayldan import qilish
                 if request.FILES.get('import_file'):
                     uploaded_file = request.FILES['import_file']
                     import_count = process_import_file(uploaded_file, test)
                     saved_questions += import_count
             
             elif method == 'text':
-                # Matndan import qilish
                 questions_text = request.POST.get('questions_text', '').strip()
                 if questions_text:
                     text_count = process_questions_text(questions_text, test)
