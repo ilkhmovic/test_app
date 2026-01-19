@@ -11,8 +11,8 @@
                     <span class="text-warning">Sinab Ko'ring!</span>
                 </h1>
                 <p class="lead mb-4">
-                    Turli sohalar bo'yicha testlar yeching, o'z testingizni yarating 
-                    va bilimingizni oshiring. Platformamizda har qanday mavzuda test 
+                    Turli sohalar bo'yicha testlar yeching, o'z testingizni yarating
+                    va bilimingizni oshiring. Platformamizda har qanday mavzuda test
                     topshirishingiz mumkin.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
@@ -79,7 +79,7 @@
                         </div>
                         <h5 class="fw-bold">Tez va Oson</h5>
                         <p class="text-muted">
-                            Bir necha daqiqada test yarating yoki topshiring. 
+                            Bir necha daqiqada test yarating yoki topshiring.
                             Interfeys oddiy va tushunarli.
                         </p>
                     </div>
@@ -93,7 +93,7 @@
                         </div>
                         <h5 class="fw-bold">Batafsil Natijalar</h5>
                         <p class="text-muted">
-                            Har bir testdan so'ng batafsil natijalar va 
+                            Har bir testdan so'ng batafsil natijalar va
                             tahlillarni oling.
                         </p>
                     </div>
@@ -107,7 +107,7 @@
                         </div>
                         <h5 class="fw-bold">Hamkorlik</h5>
                         <p class="text-muted">
-                            Do'stlaringiz bilan testlar ulashing va 
+                            Do'stlaringiz bilan testlar ulashing va
                             ularning natijalarini ko'ring.
                         </p>
                     </div>
@@ -142,9 +142,19 @@
             {% for test in tests %}
             <div class="col-xl-4 col-lg-6 col-md-6">
                 <div class="test-card card border-0 shadow-sm h-100">
-                    <div class="card-header bg-transparent border-0 pb-0">
-                        <span class="badge bg-primary">{{ test.category.name }}</span>
-                        <span class="badge bg-secondary ms-1">{{ test.question_set.count }} savol</span>
+                    <div
+                        class="card-header bg-transparent border-0 pb-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-primary">{{ test.category.name }}</span>
+                            <span class="badge bg-secondary ms-1">{{ test.question_set.count }} savol</span>
+                        </div>
+                        <span class="badge bg-warning text-dark">
+                            {% if test.avg_rating %}
+                            <i class="fas fa-star"></i> {{ test.avg_rating|floatformat:1 }}
+                            {% else %}
+                            <i class="far fa-star"></i> 0
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title fw-bold">
@@ -153,12 +163,13 @@
                             </a>
                         </h5>
                         <p class="card-text text-muted small">
-                            {{ test.question_set.count }} ta savol • 
-                            {{ test.maximum_attempts }} urinish • 
+                            {{ test.question_set.count }} ta savol •
+                            {{ test.maximum_attempts }} urinish •
                             {{ test.pass_percentage }}% o'tish
                         </p>
                         <div class="test-meta">
                             <div class="d-flex align-items-center mb-2">
+
                                 <i class="fas fa-user text-muted me-2"></i>
                                 <small class="text-muted">
                                     <a href="{% url 'profile' test.author.username %}" class="text-decoration-none">
@@ -167,9 +178,9 @@
                                 </small>
                             </div>
                             <div class="d-flex align-items-center">
-                                <i class="fas fa-calendar text-muted me-2"></i>
+                                <i class="fas fa-clock text-muted me-2"></i>
                                 <small class="text-muted">
-                                    {{ test.start_date|date:"d.m.Y" }} - {{ test.end_date|date:"d.m.Y" }}
+                                    {{ test.duration }} daqiqa
                                 </small>
                             </div>
                         </div>
@@ -189,7 +200,7 @@
             </div>
             {% endfor %}
         </div>
-        
+
         <!-- Pagination -->
         <!-- Pagination -->
         {% if tests.has_other_pages %}
@@ -210,15 +221,15 @@
                         {% endif %}
 
                         {% for i in tests.paginator.page_range %}
-                            {% if tests.number == i %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ i }}</span>
-                            </li>
-                            {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                            </li>
-                            {% endif %}
+                        {% if tests.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endif %}
                         {% endfor %}
 
                         {% if tests.has_next %}
@@ -278,81 +289,81 @@
 {% endif %}
 
 <style>
-.hero-section {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-}
+    .hero-section {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
 
-.feature-icon {
-    width: 70px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.test-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 15px;
-}
+    .test-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+    }
 
-.test-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-}
+    .test-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    }
 
-.feature-card {
-    transition: transform 0.3s ease;
-    border-radius: 15px;
-}
+    .feature-card {
+        transition: transform 0.3s ease;
+        border-radius: 15px;
+    }
 
-.feature-card:hover {
-    transform: translateY(-5px);
-}
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
 
-.stat-item {
-    padding: 10px;
-}
+    .stat-item {
+        padding: 10px;
+    }
 
-.social-links a {
-    transition: color 0.3s ease;
-}
+    .social-links a {
+        transition: color 0.3s ease;
+    }
 
-.social-links a:hover {
-    color: #ffc107 !important;
-}
+    .social-links a:hover {
+        color: #ffc107 !important;
+    }
 
-.text-light-50 {
-    color: rgba(255, 255, 255, 0.8) !important;
-}
+    .text-light-50 {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
 
-.empty-state {
-    max-width: 400px;
-    margin: 0 auto;
-}
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
 </style>
 
 <script>
-// Simple search functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const testCards = document.querySelectorAll('.test-card');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            testCards.forEach(card => {
-                const title = card.querySelector('.card-title').textContent.toLowerCase();
-                const category = card.querySelector('.badge').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || category.includes(searchTerm)) {
-                    card.parentElement.style.display = 'block';
-                } else {
-                    card.parentElement.style.display = 'none';
-                }
+    // Simple search functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const testCards = document.querySelectorAll('.test-card');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+
+                testCards.forEach(card => {
+                    const title = card.querySelector('.card-title').textContent.toLowerCase();
+                    const category = card.querySelector('.badge').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) || category.includes(searchTerm)) {
+                        card.parentElement.style.display = 'block';
+                    } else {
+                        card.parentElement.style.display = 'none';
+                    }
+                });
             });
-        });
-    }
-});
+        }
+    });
 </script>
 {% endblock %}

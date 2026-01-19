@@ -1,7 +1,31 @@
 {% extends "base.html" %}
 {% block title %} {{ test.title }} - Batafsil {% endblock title %}
 {% block content %}
-<div class="container mt-4">
+<style>
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .rating input {
+        display: none;
+    }
+
+    .rating label {
+        cursor: pointer;
+        font-size: 30px;
+        color: #ccc;
+        transition: color 0.2s;
+    }
+
+    .rating label:hover,
+    .rating label:hover~label,
+    .rating input:checked~label {
+        color: #ffc107;
+    }
+</style>
+<div class="content mt-3">
     <div class="card">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
@@ -9,7 +33,7 @@
                 <span class="badge bg-light text-dark">{{ test.category.name }}</span>
             </div>
         </div>
-        
+
         <div class="card-body">
             <!-- Test ma'lumotlari -->
             <div class="row mb-4">
@@ -31,13 +55,10 @@
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h5>Vaqt oralig'i</h5>
+                    <h5>Test Davomiyligi</h5>
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <strong>Boshlanish:</strong> {{ test.start_date|date:"d.m.Y H:i" }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Tugash:</strong> {{ test.end_date|date:"d.m.Y H:i" }}
+                            <strong>Davomiyligi:</strong> {{ test.duration }} daqiqa
                         </li>
                         <li class="list-group-item">
                             <strong>Topshirilgan:</strong> {{ test.checktest_set.count }} marta
@@ -45,7 +66,7 @@
                     </ul>
                 </div>
             </div>
-            
+
             <!-- Savollar -->
             <h5>Savollar</h5>
             {% for question in questions %}
@@ -89,7 +110,7 @@
                 </div>
             </div>
             {% endfor %}
-            
+
             <div class="mt-4">
                 <a href="{% url 'my_tests' %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Orqaga
@@ -97,9 +118,41 @@
                 <a href="{% url 'ready_to_test' test.id %}" class="btn btn-primary">
                     <i class="fas fa-play"></i> Testni Boshlash
                 </a>
+                <a href="https://t.me/share/url?url=http://127.0.0.1:8000/ready_to_test/{{ test.id }}/&text=Men zo'r test topdim: {{ test.title }}. Sinab ko'r!"
+                    target="_blank" class="btn btn-info text-white">
+                    <i class="fab fa-telegram-plane"></i> Ulashish
+                </a>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="card mt-4">
+    <div class="card-header bg-secondary text-white">
+        <h4 class="mb-0">Sharhlar va Baholar</h4>
+    </div>
+    <div class="card-body">
+
+
+        <div class="reviews-list">
+            {% for review in test.review_set.all %}
+            <div class="review-item mb-3 p-3 border rounded">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ review.user.username }}</strong>
+                    <span class="text-warning">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %} {% endfor %} </span>
+                </div>
+                <p class="mb-1">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+            </div>
+            {% empty %}
+            <p>Hozircha sharhlar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 </div>
 <br>
 {% endblock content %}

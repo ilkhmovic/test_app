@@ -1,63 +1,63 @@
 {% extends "base.html" %}
 {% block title %} Ready to Test {% endblock title %}
 {% block content %}
-    <div class="content mt-5">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Sinovga tayyormisiz: "{{ test.title }}" testi</h3>
-            </div>
-            <div class="card-body">
-                <p class="card-text">
-                    <strong>Batafsil:</strong> Bu testda <strong>{{ test.question_set.all.count }}</strong> ta savol bor.
-                    <br>Sizda jami <strong>{{ test.maximum_attempts }}</strong> ta urinish bor.
-                </p>
-                <p class="card-text">
-                    <strong>Bu test vaqti {{ test.start_date|date:"Y-yil d-m, H:i" }} dan {{ test.end_date|date:"d-m, H:i" }} gacha</strong> bo'lganligiga ishonch hosil qiling.
-                </p>
-                <p class="card-text">
-                    <strong>Muallif</strong> 
-                    <a href="{% url 'profile' test.author.username %}" class="text-decoration-none">
-                        @{{ test.author.username }}
-                    </a>
-                </p>
-                <p class="card-text">
-                    <strong>Kategoriya:</strong> {{ test.category.name }}
-                </p>
-                <p class="card-text">
-                    <strong>O'tish foizi:</strong> {{ test.pass_percentage }}%
-                </p>
-                
-                <div class="mt-4">
-                    <a class="btn btn-primary btn-lg" href="{% url 'test' test.id %}">
-                        Testni boshlash
-                    </a>
-                    <a class="btn btn-outline-secondary" href="{% url 'index' %}">Bekor qilish</a>
-                </div>
+<div class="content mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Sinovga tayyormisiz: "{{ test.title }}" testi</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text">
+                <strong>Batafsil:</strong> Bu testda <strong>{{ test.question_set.all.count }}</strong> ta savol bor.
+                <br>Sizda jami <strong>{{ test.maximum_attempts }}</strong> ta urinish bor.
+            </p>
+            <p class="card-text">
+                <strong>Davomiyligi: {{ test.duration }} daqiqa.</strong> Vaqt tugashi bilan test avtomatik yopiladi.
+            </p>
+            <p class="card-text">
+                <strong>Muallif</strong>
+                <a href="{% url 'profile' test.author.username %}" class="text-decoration-none">
+                    @{{ test.author.username }}
+                </a>
+            </p>
+            <p class="card-text">
+                <strong>Kategoriya:</strong> {{ test.category.name }}
+            </p>
+            <p class="card-text">
+                <strong>O'tish foizi:</strong> {{ test.pass_percentage }}%
+            </p>
+
+            <div class="mt-4">
+                <a class="btn btn-primary btn-lg" href="{% url 'test' test.id %}">
+                    Testni boshlash
+                </a>
+                <a class="btn btn-outline-secondary" href="{% url 'index' %}">Bekor qilish</a>
             </div>
         </div>
     </div>
+</div>
 
-    <style>
-        .card {
-            border: none;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            border-radius: 12px;
-        }
-        
-        .card-header {
-            border-radius: 12px 12px 0 0 !important;
-        }
-        
-        .card-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        
-        .btn-lg {
-            padding: 12px 30px;
-            font-size: 18px;
-            border-radius: 8px;
-        }
-    </style>
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .card-text {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .btn-lg {
+        padding: 12px 30px;
+        font-size: 18px;
+        border-radius: 8px;
+    }
+</style>
 {% endblock content %}

@@ -16,8 +16,8 @@ class Test(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     maximum_attempts = models.PositiveBigIntegerField()
-    start_date = models.DateTimeField(default=timezone.now)
-    end_date = models.DateTimeField(default=timezone.now() + datetime.timedelta(days=10))
+    # start_date and end_date removed as per request
+    duration = models.PositiveIntegerField(default=20, help_text="Test davomiyligi (daqiqada)")
     pass_percentage = models.PositiveBigIntegerField()
 
     def __str__(self):
@@ -41,6 +41,9 @@ class CheckTest(models.Model):
     finded_questions = models.PositiveBigIntegerField(default=0)
     user_passed = models.BooleanField(default=False)
     percentage = models.PositiveBigIntegerField(default=0)
+    is_public = models.BooleanField(default=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "Test of " + str(self.student.username)
@@ -66,6 +69,17 @@ class CheckTest(models.Model):
             percentage=self.percentage,
             user_passed=self.user_passed
         )
+
+        # Update User Profile Score
+        # Update User Profile Score
+        try:
+            profile = self.student.profile
+            # Har bir to'g'ri javob uchun 1 ball (o'tgan-o'tmaganidan qat'iy nazar)
+            score_increase = self.finded_questions * 1 
+            profile.total_score += score_increase
+            profile.save()
+        except Exception:
+            pass
     
 class CheckQuestion(models.Model):
     checktest = models.ForeignKey(CheckTest, on_delete=models.CASCADE)
@@ -86,3 +100,34 @@ def update_test_results(sender, instance, created, **kwargs):
     """CheckQuestion saqlandi, CheckTest natijalarini yangilash"""
     if created:
         instance.checktest.calculate_results()
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.test.title} ({self.rating})"
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(max_length=500, blank=True)
+    # Avatar is simplified for now, as Pillow is installed but handling image upload requires MEDIA settings
+    total_score = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return self.user.username
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    try:
+        instance.profile.save()
+    except Profile.DoesNotExist:
+        Profile.objects.create(user=instance)

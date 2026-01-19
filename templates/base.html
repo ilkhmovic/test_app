@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,35 +10,37 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     {% block extra_css %}{% endblock %}
-    
+
     <style>
         /* Footer pastki qismga yopishish uchun */
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-        
+
         main {
             flex: 1;
         }
-        
+
         footer {
             margin-top: auto;
         }
-        
+
         /* Qo'shimcha: Kontent kam bo'lsa markazlashtirish */
         .min-vh-80 {
             min-height: 80vh;
         }
     </style>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -45,16 +48,21 @@
             <a class="navbar-brand fw-bold" href="/">
                 <i class="fas fa-graduation-cap me-2"></i>Test Platformasi
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'index' %}">
                             <i class="fas fa-home me-1"></i> Bosh Sahifa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'leaderboard' %}">
+                            <i class="fas fa-trophy me-1"></i> Reyting
                         </a>
                     </li>
                     {% if user.is_authenticated %}
@@ -70,8 +78,15 @@
                     </li>
                     {% endif %}
                 </ul>
-                
+
                 <div class="d-flex align-items-center">
+                    <form class="d-flex me-3" action="{% url 'index' %}" method="get">
+
+                        <input class="form-control me-2" type="search" placeholder="Testlarni qidirish..."
+                            aria-label="Search" name="q">
+                        <button class="btn btn-outline-light" type="submit">Qidirish</button>
+                    </form>
+
                     {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -83,7 +98,9 @@
                                     <i class="fas fa-user-circle me-2"></i> Profil
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form method="post" action="{% url 'logout' %}" class="d-inline">
                                     {% csrf_token %}
@@ -124,7 +141,7 @@
                         <i class="fas fa-graduation-cap me-2"></i>Test Platformasi
                     </h5>
                     <p class="text-light-50">
-                        O'z bilimingizni sinab ko'ring va yangi testlar yarating. 
+                        O'z bilimingizni sinab ko'ring va yangi testlar yarating.
                         Bilim - kuch!
                     </p>
                     <div class="social-links">
@@ -134,7 +151,7 @@
                         <a href="#" class="text-light"><i class="fab fa-youtube fa-lg"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Tez Havolalar</h6>
                     <ul class="list-unstyled">
@@ -143,37 +160,43 @@
                         </li>
                         {% if user.is_authenticated %}
                         <li class="mb-2">
-                            <a href="{% url 'my_tests' %}" class="text-light-50 text-decoration-none">Mening Testlarim</a>
+                            <a href="{% url 'my_tests' %}" class="text-light-50 text-decoration-none">Mening
+                                Testlarim</a>
                         </li>
                         <li class="mb-2">
-                            <a href="{% url 'create_test' %}" class="text-light-50 text-decoration-none">Test Yaratish</a>
+                            <a href="{% url 'create_test' %}" class="text-light-50 text-decoration-none">Test
+                                Yaratish</a>
                         </li>
                         {% else %}
                         <li class="mb-2">
                             <a href="{% url 'login' %}" class="text-light-50 text-decoration-none">Kirish</a>
                         </li>
                         <li class="mb-2">
-                            <a href="{% url 'signup' %}" class="text-light-50 text-decoration-none">Ro'yxatdan o'tish</a>
+                            <a href="{% url 'signup' %}" class="text-light-50 text-decoration-none">Ro'yxatdan
+                                o'tish</a>
                         </li>
                         {% endif %}
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Statistika</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <span class="text-light-50">Jami Testlar: {% if total_tests_count %}{{ total_tests_count }}{% else %}0{% endif %}</span>
+                            <span class="text-light-50">Jami Testlar: {% if total_tests_count %}{{ total_tests_count
+                                }}{% else %}0{% endif %}</span>
                         </li>
                         <li class="mb-2">
-                            <span class="text-light-50">Faol Foydalanuvchilar: {% if active_users_count %}{{ active_users_count }}{% else %}0{% endif %}</span>
+                            <span class="text-light-50">Faol Foydalanuvchilar: {% if active_users_count %}{{
+                                active_users_count }}{% else %}0{% endif %}</span>
                         </li>
                         <li class="mb-2">
-                            <span class="text-light-50">Topshirilgan Testlar: {% if completed_tests_count %}{{ completed_tests_count }}{% else %}0{% endif %}</span>
+                            <span class="text-light-50">Topshirilgan Testlar: {% if completed_tests_count %}{{
+                                completed_tests_count }}{% else %}0{% endif %}</span>
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Aloqa</h6>
                     <ul class="list-unstyled">
@@ -192,9 +215,9 @@
                     </ul>
                 </div>
             </div>
-            
+
             <hr class="bg-light my-4">
-            
+
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
                     <p class="mb-0 text-light-50">
@@ -214,4 +237,5 @@
     <script src="{% static 'scripts.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Test, Question, Category, CheckQuestion, CheckTest
+from .models import Test, Question, Category, CheckQuestion, CheckTest, Review, Profile
 
 class QuestionInline(admin.TabularInline):
     model = Question
@@ -12,7 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]  # QuestionInline dan foydalanish
-    list_display = ['title', 'author', 'category', 'start_date', 'end_date']
+    list_display = ['title', 'author', 'category', 'duration']
     search_fields = ['title', 'author__username', 'category__name']
 
 @admin.register(Question)
@@ -27,3 +27,13 @@ class CheckTestAdmin(admin.ModelAdmin):
 @admin.register(CheckQuestion)
 class CheckQuestionAdmin(admin.ModelAdmin):
     list_display = ['checktest', 'question', 'given_answer', 'true_answer', 'is_true']
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ['user', 'test', 'rating', 'created_at']
+    search_fields = ['user__username', 'test__title']
+    list_filter = ['rating']
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'total_score']
+    search_fields = ['user__username']

@@ -17,4 +17,7 @@ urlpatterns = [
     path('test/<int:test_id>/parse-questions/', views.parse_questions, name='parse_questions'),
     path('test/<int:test_id>/mass-create/', views.mass_create_questions, name='mass_create_questions'),
     path('test/<int:test_id>/add-question/', views.add_question, name='add_question'),
+    path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('test/<int:test_id>/review/', views.add_review, name='add_review'),
+    path('result/<int:checktest_id>/certificate/', views.generate_certificate, name='generate_certificate'),
 ]

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Test, Question, CheckQuestion, CheckTest, Category
+from .models import Test, Question, CheckQuestion, CheckTest, Category, Review, Profile
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -16,6 +16,11 @@ from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from test_app import settings
+from django.db.models import Q
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, landscape
+from django.http import HttpResponse
+import io
 
 def signup(request):
     form = UserCreationForm()
@@ -26,8 +31,14 @@ def signup(request):
             return redirect('login')
     return render(request, 'registration/signup.html', {'form': form})
 
+from django.db.models import Avg
+
 def index(request):
-    tests_list = Test.objects.all().order_by('-id')  
+    query = request.GET.get('q')
+    if query:
+        tests_list = Test.objects.filter(Q(title__icontains=query) | Q(category__name__icontains=query)).annotate(avg_rating=Avg('review__rating')).order_by('-id')
+    else:
+        tests_list = Test.objects.all().annotate(avg_rating=Avg('review__rating')).order_by('-id')  
     page = request.GET.get('page', 1)
     paginator = Paginator(tests_list, getattr(settings, 'TESTS_PER_PAGE', 6))
     
@@ -78,8 +89,28 @@ def test(request, test_id):
     questions = Question.objects.filter(test=test)
     
     if request.method == "POST":
-        checktest = CheckTest.objects.create(student=request.user, test=test)
+        # Check duration
+        start_time_str = request.session.get(f'test_{test_id}_start')
+        is_late = False
         
+        if start_time_str:
+            start_time = datetime.datetime.fromisoformat(start_time_str)
+            if start_time.tzinfo is None:
+                start_time = timezone.make_aware(start_time)
+            elapsed = timezone.now() - start_time
+            # 1 daqiqa (60s) qo'shimcha vaqt (internet/server kechikishi uchun)
+            if elapsed.total_seconds() > (test.duration * 60 + 60):
+                is_late = True
+        
+        checktest = CheckTest.objects.create(student=request.user, test=test)
+        # Set started_at from session if available
+        if start_time_str:
+             start_time_obj = datetime.datetime.fromisoformat(start_time_str)
+             if start_time_obj.tzinfo is None:
+                 start_time_obj = timezone.make_aware(start_time_obj)
+             checktest.started_at = start_time_obj
+             checktest.save()
+
         for question in questions:
             answer_key = str(question.id)
             if answer_key in request.POST:
@@ -94,12 +125,48 @@ def test(request, test_id):
                 )
         
         checktest.calculate_results()
+        
+        if is_late:
+            # Revert score added by calculate_results
+            try:
+                profile = request.user.profile
+                score_to_remove = checktest.finded_questions # 1 point per question
+                if score_to_remove > 0:
+                    profile.total_score -= score_to_remove
+                    profile.save()
+            except:
+                pass
+
+            checktest.percentage = 0
+            checktest.user_passed = False
+            # We keep finded_questions for historical accuracy or set to 0? 
+            # User requirement: "vaqt tugaganidan keyin testdan yiqitgani haqida malumot qosh va unga ball ham berma"
+            # So result should imply 0 score. 
+            # But maybe show "You got X correct but Time Over".
+            # For now, let's keep finded_questions but ensure result page shows failed.
+            checktest.save()
+
         return redirect('test_result', checktest_id=checktest.id)
     
+    # GET request - Start Timer
+    start_time_str = request.session.get(f'test_{test_id}_start')
+    if not start_time_str:
+        start_time_str = timezone.now().isoformat()
+        request.session[f'test_{test_id}_start'] = start_time_str
+    
+    # Parse the datetime string and make it timezone-aware if needed
+    start_time = datetime.datetime.fromisoformat(start_time_str)
+    if start_time.tzinfo is None:
+        start_time = timezone.make_aware(start_time)
+    
+    elapsed = timezone.now() - start_time
+    remaining_seconds = max(0, test.duration * 60 - elapsed.total_seconds())
+
     context = {
         "test": test, 
         "questions": questions,
         'tests': tests,
+        'remaining_seconds': int(remaining_seconds),
         'total_tests_count': total_tests_count,
         'active_users_count': active_users_count,
         'completed_tests_count': completed_tests_count,}
@@ -161,18 +228,14 @@ def create_test(request):
             category_id = request.POST.get('category')
             maximum_attempts = request.POST.get('maximum_attempts')
             pass_percentage = request.POST.get('pass_percentage')
-            days_duration = request.POST.get('days_duration', 10)
-            
-            start_date = timezone.now()
-            end_date = start_date + datetime.timedelta(days=int(days_duration))
+            duration = request.POST.get('duration', 20)  # Default 20 minutes
             
             test = Test.objects.create(
                 title=title,
                 category_id=category_id,
                 maximum_attempts=maximum_attempts,
                 pass_percentage=pass_percentage,
-                start_date=start_date,
-                end_date=end_date,
+                duration=int(duration),
                 author=request.user
             )
             
@@ -626,3 +689,119 @@ def mass_create_questions(request, test_id):
     except Exception as e:
         print(f"Xatolik: {str(e)}")  # Debug uchun
         return render(request, 'error.html', {'error': str(e)})
+
+def leaderboard(request):
+    top_users = Profile.objects.all().order_by('-total_score')[:10]
+    return render(request, 'leaderboard.html', {'top_users': top_users})
+
+@login_required(login_url='login')
+def add_review(request, test_id):
+    if request.method == 'POST':
+        test = get_object_or_404(Test, id=test_id)
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        Review.objects.create(user=request.user, test=test, rating=rating, comment=comment)
+        return redirect('index')
+    return redirect('index')
+
+@login_required(login_url='login')
+def generate_certificate(request, checktest_id):
+    checktest = get_object_or_404(CheckTest, id=checktest_id, student=request.user)
+    if not checktest.user_passed:
+        return HttpResponse("Sertifikat faqat testdan o'tganlarga beriladi.")
+    
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=landscape(A4))
+    width, height = landscape(A4)
+    
+    # --- Colors ---
+    navy_blue = (0/255, 32/255, 96/255)
+    gold = (212/255, 175/255, 55/255)
+    
+    # --- Border ---
+    c.setStrokeColorRGB(*navy_blue)
+    c.setLineWidth(5)
+    c.rect(20, 20, width-40, height-40)
+    
+    c.setStrokeColorRGB(*gold)
+    c.setLineWidth(2)
+    c.rect(28, 28, width-56, height-56)
+
+    # --- Header ---
+    c.setFont("Helvetica-Bold", 36)
+    c.setFillColorRGB(*navy_blue)
+    c.drawCentredString(width/2, height-100, "VANTAGE TEST PLATFORMASI")
+    
+    c.setFont("Helvetica", 18)
+    c.setFillColorRGB(0.5, 0.5, 0.5)
+    c.drawCentredString(width/2, height-140, "MAXSUS SERTIFIKAT")
+
+    # --- Body ---
+    c.setFont("Helvetica-Oblique", 24)
+    c.setFillColorRGB(0, 0, 0)
+    c.drawCentredString(width/2, height-220, "Ushbu sertifikat tasdiqlaydi,")
+    
+    # Student Name
+    c.setFont("Helvetica-Bold", 40)
+    c.setFillColorRGB(*navy_blue)
+    name = checktest.student.username.upper()
+    c.drawCentredString(width/2, height-280, name)
+    
+    c.setLineWidth(1)
+    c.line(width/2 - 200, height-290, width/2 + 200, height-290)
+
+    # Context
+    c.setFont("Helvetica", 20)
+    c.setFillColorRGB(0, 0, 0)
+    c.drawCentredString(width/2, height-330, "Muvaffaqiyatli tamomladi:")
+    
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width/2, height-370, checktest.test.title)
+    
+    # Score
+    c.setFont("Helvetica", 18)
+    c.drawCentredString(width/2, height-420, f"To'plangan ball: {checktest.percentage}%")
+
+    # --- Footer ---
+    today = timezone.now().strftime("%d.%m.%Y")
+    
+    c.setFont("Helvetica", 14)
+    c.drawString(100, 80, f"Sana: {today}")
+    
+    c.drawString(width-300, 80, "Imzo: __________________")
+    c.setFont("Helvetica-Oblique", 10)
+    c.drawString(width-300, 60, "Platforma Adminstratori")
+
+    # --- Stamp (Pechat) ---
+    c.saveState()
+    c.translate(width-220, 90) # Position over the signature area
+    c.rotate(-15) # Slight rotation
+    
+    # Outer Circle
+    c.setStrokeColorRGB(0.6, 0.1, 0.1) # Dark Red
+    c.setLineWidth(3)
+    c.circle(0, 0, 45, stroke=1, fill=0)
+    
+    # Inner Circle
+    c.setLineWidth(1)
+    c.circle(0, 0, 42, stroke=1, fill=0)
+    
+    # Text inside stamp
+    c.setFont("Helvetica-Bold", 10)
+    c.setFillColorRGB(0.6, 0.1, 0.1)
+    c.drawCentredString(0, 15, "VANTAGE TEST")
+    
+    c.setFont("Helvetica-Bold", 8)
+    c.drawCentredString(0, 0, "PLATFORMASI")
+    
+    c.setFont("Helvetica", 7)
+    c.drawCentredString(0, -15, "Administrator")
+    c.drawCentredString(0, -25, "TAMONIDAN IMZOLANDI")
+    
+    c.restoreState()
+
+    c.showPage()
+    c.save()
+    
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')

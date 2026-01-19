@@ -14,17 +14,20 @@
             <!-- Tab Navigatsiya -->
             <ul class="nav nav-pills mb-4" id="createTestTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="basic-tab" data-bs-toggle="pill" data-bs-target="#basic" type="button">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="pill" data-bs-target="#basic"
+                        type="button">
                         <i class="fas fa-info-circle me-1"></i> Test Ma'lumotlari
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="manual-tab" data-bs-toggle="pill" data-bs-target="#manual" type="button">
+                    <button class="nav-link" id="manual-tab" data-bs-toggle="pill" data-bs-target="#manual"
+                        type="button">
                         <i class="fas fa-keyboard me-1"></i> Qo'lda Kiritish
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="import-tab" data-bs-toggle="pill" data-bs-target="#import" type="button">
+                    <button class="nav-link" id="import-tab" data-bs-toggle="pill" data-bs-target="#import"
+                        type="button">
                         <i class="fas fa-file-import me-1"></i> Fayldan Import
                     </button>
                 </li>
@@ -37,22 +40,23 @@
 
             <!-- Tab Kontent -->
             <div class="tab-content" id="createTestTabContent">
-                
+
                 <!-- 1. Test Ma'lumotlari -->
                 <div class="tab-pane fade show active" id="basic" role="tabpanel">
                     <div class="test-basic-info">
                         <h5 class="mb-4 text-primary">
                             <i class="fas fa-info-circle me-2"></i>Test Asosiy Ma'lumotlari
                         </h5>
-                        
+
                         <form method="post" id="basicForm">
                             {% csrf_token %}
                             <input type="hidden" name="method" value="basic">
-                            
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Test Nomi</label>
-                                    <input type="text" name="title" class="form-control" placeholder="Test nomini kiriting" required>
+                                    <input type="text" name="title" class="form-control"
+                                        placeholder="Test nomini kiriting" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Kategoriya</label>
@@ -64,19 +68,22 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold">Urinishlar soni</label>
-                                    <input type="number" name="maximum_attempts" class="form-control" min="1" value="3" required>
+                                    <input type="number" name="maximum_attempts" class="form-control" min="1" value="3"
+                                        required>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold">O'tish foizi (%)</label>
-                                    <input type="number" name="pass_percentage" class="form-control" min="0" max="100" value="60" required>
+                                    <input type="number" name="pass_percentage" class="form-control" min="0" max="100"
+                                        value="60" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-bold">Muddati (kun)</label>
-                                    <input type="number" name="days_duration" class="form-control" min="1" max="365" value="10" required>
+                                    <label class="form-label fw-bold">Davomiyligi (daqiqa)</label>
+                                    <input type="number" name="duration" class="form-control" min="1" value="20"
+                                        required>
                                 </div>
                             </div>
 
@@ -99,7 +106,7 @@
                         <form method="post" id="manualForm">
                             {% csrf_token %}
                             <input type="hidden" name="method" value="manual">
-                            
+
                             <!-- Test ma'lumotlari (yashirin) -->
                             <div id="manualTestInfo" class="mb-4 p-3 bg-light rounded">
                                 <h6 class="text-muted">Test ma'lumotlari</h6>
@@ -115,12 +122,13 @@
                                     <button type="button" class="btn btn-success btn-sm" onclick="addManualQuestion()">
                                         <i class="fas fa-plus me-1"></i> Yangi Savol
                                     </button>
-                                    <button type="button" class="btn btn-info btn-sm" onclick="addMultipleManualQuestions(3)">
+                                    <button type="button" class="btn btn-info btn-sm"
+                                        onclick="addMultipleManualQuestions(3)">
                                         +3 ta
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div id="manual-questions-container" class="mb-4">
                                 <!-- Qo'lda kiritiladigan savollar shu yerda -->
                             </div>
@@ -129,7 +137,8 @@
                                 <button type="submit" class="btn btn-success btn-lg">
                                     <i class="fas fa-save me-2"></i> Testni Yaratish
                                 </button>
-                                <button type="button" class="btn btn-outline-primary btn-lg" onclick="previewManualTest()">
+                                <button type="button" class="btn btn-outline-primary btn-lg"
+                                    onclick="previewManualTest()">
                                     <i class="fas fa-eye me-2"></i> Ko'rib Chiqish
                                 </button>
                             </div>
@@ -147,7 +156,7 @@
                         <form method="post" id="importForm" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="hidden" name="method" value="import">
-                            
+
                             <!-- Test ma'lumotlari (yashirin) -->
                             <div id="importTestInfo" class="mb-4 p-3 bg-light rounded">
                                 <h6 class="text-muted">Test ma'lumotlari</h6>
@@ -158,8 +167,8 @@
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Fayl tanlang</label>
-                                        <input type="file" name="import_file" class="form-control" 
-                                               accept=".csv,.xlsx,.xls" required id="importFile">
+                                        <input type="file" name="import_file" class="form-control"
+                                            accept=".csv,.xlsx,.xls" required id="importFile">
                                         <div class="form-text">
                                             CSV, XLSX yoki XLS formatidagi faylni tanlang
                                         </div>
@@ -193,8 +202,8 @@
                                         </div>
                                     </div>
 
-                                    <a href="{% static 'samples/questions_template.csv' %}" class="btn btn-outline-success btn-sm" 
-                                       download="savollar_namuna.csv">
+                                    <a href="{% static 'samples/questions_template.csv' %}"
+                                        class="btn btn-outline-success btn-sm" download="savollar_namuna.csv">
                                         <i class="fas fa-download me-1"></i> Namuna CSV yuklab olish
                                     </a>
                                 </div>
@@ -219,7 +228,7 @@
                         <form method="post" id="textForm">
                             {% csrf_token %}
                             <input type="hidden" name="method" value="text">
-                            
+
                             <!-- Test ma'lumotlari (yashirin) -->
                             <div id="textTestInfo" class="mb-4 p-3 bg-light rounded">
                                 <h6 class="text-muted">Test ma'lumotlari</h6>
@@ -230,8 +239,8 @@
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Savollar matni</label>
-                                        <textarea name="questions_text" class="form-control" rows="12" 
-                                                  placeholder="Savollarni quyidagi formatda kiriting..." required></textarea>
+                                        <textarea name="questions_text" class="form-control" rows="12"
+                                            placeholder="Savollarni quyidagi formatda kiriting..." required></textarea>
                                     </div>
 
                                     <div class="mb-3">
@@ -290,10 +299,10 @@ Javob: B
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label fw-bold">Savol Matni</label>
-                <textarea name="manual_questions[]" class="form-control" rows="3" 
-                          placeholder="Savol matnini kiriting..." required></textarea>
+                <textarea name="manual_questions[]" class="form-control" rows="3"
+                    placeholder="Savol matnini kiriting..." required></textarea>
             </div>
-            
+
             <div class="row g-2">
                 <div class="col-md-6">
                     <div class="input-group mb-2">
@@ -320,7 +329,7 @@ Javob: B
                     </div>
                 </div>
             </div>
-            
+
             <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="form-label fw-bold text-danger">To'g'ri Javob</label>
@@ -338,239 +347,239 @@ Javob: B
 </template>
 
 <script>
-let manualQuestionCounter = 0;
-let testData = {};
+    let manualQuestionCounter = 0;
+    let testData = {};
 
-// Asosiy form yuborilganda
-document.getElementById('basicForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Ma'lumotlarni yig'ish
-    const formData = new FormData(this);
-    testData = {
-        title: formData.get('title'),
-        category: formData.get('category'),
-        maximum_attempts: formData.get('maximum_attempts'),
-        pass_percentage: formData.get('pass_percentage'),
-        days_duration: formData.get('days_duration')
-    };
-    
-    // Test ma'lumotlarini ko'rsatish
-    updateTestInfo();
-    
-    // Keyingi tab ga o'tish
-    const manualTab = new bootstrap.Tab(document.getElementById('manual-tab'));
-    manualTab.show();
-});
+    // Asosiy form yuborilganda
+    document.getElementById('basicForm').addEventListener('submit', function (e) {
+        e.preventDefault();
 
-// Test ma'lumotlarini yangilash
-function updateTestInfo() {
-    const testInfoHTML = `
+        // Ma'lumotlarni yig'ish
+        const formData = new FormData(this);
+        testData = {
+            title: formData.get('title'),
+            category: formData.get('category'),
+            maximum_attempts: formData.get('maximum_attempts'),
+            pass_percentage: formData.get('pass_percentage'),
+            duration: formData.get('duration')
+        };
+
+        // Test ma'lumotlarini ko'rsatish
+        updateTestInfo();
+
+        // Keyingi tab ga o'tish
+        const manualTab = new bootstrap.Tab(document.getElementById('manual-tab'));
+        manualTab.show();
+    });
+
+    // Test ma'lumotlarini yangilash
+    function updateTestInfo() {
+        const testInfoHTML = `
         <strong>${testData.title}</strong> | 
         Urinishlar: ${testData.maximum_attempts} | 
         O'tish: ${testData.pass_percentage}% |
-        Muddati: ${testData.days_duration} kun
+        Davomiyligi: ${testData.duration} daqiqa
     `;
-    
-    document.getElementById('manualTestInfo').innerHTML = testInfoHTML;
-    document.getElementById('importTestInfo').innerHTML = testInfoHTML;
-    document.getElementById('textTestInfo').innerHTML = testInfoHTML;
-}
 
-// Qo'lda savol qo'shish
-function addManualQuestion() {
-    const template = document.getElementById('manualQuestionTemplate');
-    const container = document.getElementById('manual-questions-container');
-    
-    manualQuestionCounter++;
-    
-    const questionHTML = template.innerHTML.replace(/manual-question-number">\d+/g, `manual-question-number">${manualQuestionCounter}`);
-    
-    const questionElement = document.createElement('div');
-    questionElement.innerHTML = questionHTML;
-    container.appendChild(questionElement);
-    
-    updateManualQuestionsCount();
-}
-
-// Bir nechta savol qo'shish
-function addMultipleManualQuestions(count) {
-    for (let i = 0; i < count; i++) {
-        addManualQuestion();
+        document.getElementById('manualTestInfo').innerHTML = testInfoHTML;
+        document.getElementById('importTestInfo').innerHTML = testInfoHTML;
+        document.getElementById('textTestInfo').innerHTML = testInfoHTML;
     }
-}
 
-// Qo'lda savolni o'chirish
-function removeManualQuestion(button) {
-    const questionCard = button.closest('.manual-question-card');
-    const questions = document.querySelectorAll('.manual-question-card');
-    
-    if (questions.length > 1) {
-        questionCard.remove();
+    // Qo'lda savol qo'shish
+    function addManualQuestion() {
+        const template = document.getElementById('manualQuestionTemplate');
+        const container = document.getElementById('manual-questions-container');
+
+        manualQuestionCounter++;
+
+        const questionHTML = template.innerHTML.replace(/manual-question-number">\d+/g, `manual-question-number">${manualQuestionCounter}`);
+
+        const questionElement = document.createElement('div');
+        questionElement.innerHTML = questionHTML;
+        container.appendChild(questionElement);
+
         updateManualQuestionsCount();
-        renumberManualQuestions();
-    } else {
-        alert('Kamida bitta savol bo\'lishi kerak!');
     }
-}
 
-// Qo'lda savollarni qayta raqamlash
-function renumberManualQuestions() {
-    const questions = document.querySelectorAll('.manual-question-card');
-    questions.forEach((question, index) => {
-        const numberElement = question.querySelector('.manual-question-number');
-        numberElement.textContent = index + 1;
-    });
-    manualQuestionCounter = questions.length;
-}
-
-// Qo'lda savollar sonini yangilash
-function updateManualQuestionsCount() {
-    const countElement = document.getElementById('manualQuestionsCount');
-    const questions = document.querySelectorAll('.manual-question-card');
-    countElement.textContent = questions.length;
-}
-
-// Ko'rib chiqish
-function previewManualTest() {
-    const questions = document.querySelectorAll('.manual-question-card');
-    
-    if (questions.length === 0) {
-        alert('Iltimos, savol qo\'shing!');
-        return;
-    }
-    
-    let previewText = `Test: ${testData.title}\n\n`;
-    
-    questions.forEach((question, index) => {
-        const questionText = question.querySelector('textarea').value || `Savol ${index + 1}`;
-        const variantA = question.querySelector('input[name="manual_a[]"]').value || 'A variant';
-        const variantB = question.querySelector('input[name="manual_b[]"]').value || 'B variant';
-        const variantC = question.querySelector('input[name="manual_c[]"]').value || 'C variant';
-        const variantD = question.querySelector('input[name="manual_d[]"]').value || 'D variant';
-        const trueAnswer = question.querySelector('select[name="manual_true_answer[]"]').value || 'tanlanmagan';
-        
-        previewText += `${index + 1}. ${questionText}\n`;
-        previewText += `   A) ${variantA}\n`;
-        previewText += `   B) ${variantB}\n`;
-        previewText += `   C) ${variantC}\n`;
-        previewText += `   D) ${variantD}\n`;
-        previewText += `   To'g'ri javob: ${trueAnswer.toUpperCase()}\n\n`;
-    });
-    
-    alert(previewText);
-}
-
-// Form yuborishda test ma'lumotlarini qo'shish
-document.getElementById('manualForm').addEventListener('submit', function(e) {
-    if (!validateTestData()) {
-        e.preventDefault();
-        return;
-    }
-    
-    // Test ma'lumotlarini formga qo'shish
-    addTestDataToForm(this);
-});
-
-document.getElementById('importForm').addEventListener('submit', function(e) {
-    if (!validateTestData()) {
-        e.preventDefault();
-        return;
-    }
-    
-    addTestDataToForm(this);
-});
-
-document.getElementById('textForm').addEventListener('submit', function(e) {
-    if (!validateTestData()) {
-        e.preventDefault();
-        return;
-    }
-    
-    addTestDataToForm(this);
-});
-
-// Test ma'lumotlarini tekshirish
-function validateTestData() {
-    if (!testData.title) {
-        alert('Iltimos, avval test ma\'lumotlarini to\'ldiring!');
-        const basicTab = new bootstrap.Tab(document.getElementById('basic-tab'));
-        basicTab.show();
-        return false;
-    }
-    return true;
-}
-
-// Test ma'lumotlarini formga qo'shish
-function addTestDataToForm(form) {
-    const hiddenInputs = [
-        { name: 'title', value: testData.title },
-        { name: 'category', value: testData.category },
-        { name: 'maximum_attempts', value: testData.maximum_attempts },
-        { name: 'pass_percentage', value: testData.pass_percentage },
-        { name: 'days_duration', value: testData.days_duration }
-    ];
-    
-    hiddenInputs.forEach(input => {
-        let hiddenInput = form.querySelector(`input[name="${input.name}"]`);
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = input.name;
-            form.appendChild(hiddenInput);
+    // Bir nechta savol qo'shish
+    function addMultipleManualQuestions(count) {
+        for (let i = 0; i < count; i++) {
+            addManualQuestion();
         }
-        hiddenInput.value = input.value;
-    });
-}
+    }
 
-// Dastlabki savolni qo'shish
-document.addEventListener('DOMContentLoaded', function() {
-    addManualQuestion(); // Birinchi savolni avtomatik qo'shish
-});
+    // Qo'lda savolni o'chirish
+    function removeManualQuestion(button) {
+        const questionCard = button.closest('.manual-question-card');
+        const questions = document.querySelectorAll('.manual-question-card');
+
+        if (questions.length > 1) {
+            questionCard.remove();
+            updateManualQuestionsCount();
+            renumberManualQuestions();
+        } else {
+            alert('Kamida bitta savol bo\'lishi kerak!');
+        }
+    }
+
+    // Qo'lda savollarni qayta raqamlash
+    function renumberManualQuestions() {
+        const questions = document.querySelectorAll('.manual-question-card');
+        questions.forEach((question, index) => {
+            const numberElement = question.querySelector('.manual-question-number');
+            numberElement.textContent = index + 1;
+        });
+        manualQuestionCounter = questions.length;
+    }
+
+    // Qo'lda savollar sonini yangilash
+    function updateManualQuestionsCount() {
+        const countElement = document.getElementById('manualQuestionsCount');
+        const questions = document.querySelectorAll('.manual-question-card');
+        countElement.textContent = questions.length;
+    }
+
+    // Ko'rib chiqish
+    function previewManualTest() {
+        const questions = document.querySelectorAll('.manual-question-card');
+
+        if (questions.length === 0) {
+            alert('Iltimos, savol qo\'shing!');
+            return;
+        }
+
+        let previewText = `Test: ${testData.title}\n\n`;
+
+        questions.forEach((question, index) => {
+            const questionText = question.querySelector('textarea').value || `Savol ${index + 1}`;
+            const variantA = question.querySelector('input[name="manual_a[]"]').value || 'A variant';
+            const variantB = question.querySelector('input[name="manual_b[]"]').value || 'B variant';
+            const variantC = question.querySelector('input[name="manual_c[]"]').value || 'C variant';
+            const variantD = question.querySelector('input[name="manual_d[]"]').value || 'D variant';
+            const trueAnswer = question.querySelector('select[name="manual_true_answer[]"]').value || 'tanlanmagan';
+
+            previewText += `${index + 1}. ${questionText}\n`;
+            previewText += `   A) ${variantA}\n`;
+            previewText += `   B) ${variantB}\n`;
+            previewText += `   C) ${variantC}\n`;
+            previewText += `   D) ${variantD}\n`;
+            previewText += `   To'g'ri javob: ${trueAnswer.toUpperCase()}\n\n`;
+        });
+
+        alert(previewText);
+    }
+
+    // Form yuborishda test ma'lumotlarini qo'shish
+    document.getElementById('manualForm').addEventListener('submit', function (e) {
+        if (!validateTestData()) {
+            e.preventDefault();
+            return;
+        }
+
+        // Test ma'lumotlarini formga qo'shish
+        addTestDataToForm(this);
+    });
+
+    document.getElementById('importForm').addEventListener('submit', function (e) {
+        if (!validateTestData()) {
+            e.preventDefault();
+            return;
+        }
+
+        addTestDataToForm(this);
+    });
+
+    document.getElementById('textForm').addEventListener('submit', function (e) {
+        if (!validateTestData()) {
+            e.preventDefault();
+            return;
+        }
+
+        addTestDataToForm(this);
+    });
+
+    // Test ma'lumotlarini tekshirish
+    function validateTestData() {
+        if (!testData.title) {
+            alert('Iltimos, avval test ma\'lumotlarini to\'ldiring!');
+            const basicTab = new bootstrap.Tab(document.getElementById('basic-tab'));
+            basicTab.show();
+            return false;
+        }
+        return true;
+    }
+
+    // Test ma'lumotlarini formga qo'shish
+    function addTestDataToForm(form) {
+        const hiddenInputs = [
+            { name: 'title', value: testData.title },
+            { name: 'category', value: testData.category },
+            { name: 'maximum_attempts', value: testData.maximum_attempts },
+            { name: 'pass_percentage', value: testData.pass_percentage },
+            { name: 'duration', value: testData.duration }
+        ];
+
+        hiddenInputs.forEach(input => {
+            let hiddenInput = form.querySelector(`input[name="${input.name}"]`);
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = input.name;
+                form.appendChild(hiddenInput);
+            }
+            hiddenInput.value = input.value;
+        });
+    }
+
+    // Dastlabki savolni qo'shish
+    document.addEventListener('DOMContentLoaded', function () {
+        addManualQuestion(); // Birinchi savolni avtomatik qo'shish
+    });
 </script>
 
 <style>
-.nav-pills .nav-link {
-    border-radius: 8px;
-    margin-right: 5px;
-    font-weight: 500;
-}
+    .nav-pills .nav-link {
+        border-radius: 8px;
+        margin-right: 5px;
+        font-weight: 500;
+    }
 
-.nav-pills .nav-link.active {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-}
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+    }
 
-.card {
-    border-radius: 15px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-}
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    }
 
-.manual-question-card {
-    transition: all 0.3s ease;
-    border-radius: 10px;
-}
+    .manual-question-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
 
-.manual-question-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-}
+    .manual-question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
 
-.input-group-text {
-    border-radius: 8px 0 0 8px;
-    min-width: 40px;
-    justify-content: center;
-}
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+        min-width: 40px;
+        justify-content: center;
+    }
 
-.btn-lg {
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-size: 16px;
-}
+    .btn-lg {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+    }
 
-pre {
-    font-size: 12px;
-    line-height: 1.4;
-    white-space: pre-wrap;
-}
+    pre {
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+    }
 </style>
 {% endblock %}

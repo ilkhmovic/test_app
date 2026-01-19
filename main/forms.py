@@ -4,13 +4,12 @@ from .models import Test, Question, Category
 class TestForm(forms.ModelForm):
     class Meta:
         model = Test
-        fields = ['title', 'category', 'maximum_attempts', 'start_date', 'end_date', 'pass_percentage']
+        fields = ['title', 'category', 'maximum_attempts', 'duration', 'pass_percentage']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Test nomi'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'maximum_attempts': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'start_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'end_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Daqiqalarda (masalan 20)'}),
             'pass_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'max': 100}),
         }
 
