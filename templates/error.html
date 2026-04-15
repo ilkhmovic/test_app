@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %} Xatolik yuz berdi {% endblock title %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="mb-5">
+                <div class="d-inline-flex bg-danger bg-opacity-10 text-danger rounded-circle p-5 mb-4 shadow-sm">
+                    <i class="fas fa-exclamation-triangle fa-5x"></i>
+                </div>
+                <h1 class="display-4 fw-bold text-main mb-3">Voy! Xatolik!</h1>
+                <p class="text-muted fs-5 mb-4 px-3">Kechirasiz, kutilmagan xatolik yuz berdi. Biz buni imkon qadar tezroq hal qilishga harakat qilamiz.</p>
+                
+                {% if error %}
+                <div class="alert alert-danger border-0 rounded-4 text-start mb-4 p-4 shadow-sm" style="background: rgba(239, 68, 68, 0.05); border-left: 4px solid var(--danger) !important;">
+                    <div class="fw-bold text-danger mb-2 small text-uppercase">Xatolik tafsiloti:</div>
+                    <code class="text-main" style="word-break: break-all;">{{ error }}</code>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'index' %}" class="btn btn-primary btn-lg px-4 fw-bold" style="border-radius: 12px;">
+                        <i class="fas fa-home me-2"></i> Bosh sahifaga
+                    </a>
+                    <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg px-4 fw-bold" style="border-radius: 12px;">
+                        <i class="fas fa-arrow-left me-2"></i> Orqaga qaytish
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-5 border-top pt-4 text-muted small">
+                Agar muammo davom etsa, platforma ma'muriyatiga xabar bering.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

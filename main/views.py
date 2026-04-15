@@ -66,16 +66,16 @@ def index(request):
 def ready_to_test(request, test_id):
     tests = Test.objects.all()
     test = get_object_or_404(Test, id=test_id)
-    total_tests_count = Test.objects.count()
-    active_users_count = User.objects.filter(is_active=True).count()
-    completed_tests_count = CheckTest.objects.count()
+    
+    if request.user != test.author:
+        attempts_count = CheckTest.objects.filter(student=request.user, test=test).count()
+        if attempts_count >= test.maximum_attempts:
+            messages.error(request, f"Siz bu testni yechib bo'ldingiz! Maksimal urinishlar soni: {test.maximum_attempts}")
+            return redirect('index')
     
     context = {
         'tests': tests,
         'test': test,
-        'total_tests_count': total_tests_count,
-        'active_users_count': active_users_count,
-        'completed_tests_count': completed_tests_count,
     }
     return render(request, 'ready_to_test.html', context)
 
@@ -83,9 +83,13 @@ def ready_to_test(request, test_id):
 def test(request, test_id):
     tests = Test.objects.all()
     test = get_object_or_404(Test, id=test_id)
-    total_tests_count = Test.objects.count()
-    active_users_count = User.objects.filter(is_active=True).count()
-    completed_tests_count = CheckTest.objects.count()
+    
+    if request.user != test.author:
+        attempts_count = CheckTest.objects.filter(student=request.user, test=test).count()
+        if attempts_count >= test.maximum_attempts:
+            messages.error(request, f"Siz bu testni yechib bo'ldingiz! Maksimal urinishlar soni: {test.maximum_attempts}")
+            return redirect('index')
+
     questions = Question.objects.filter(test=test)
     
     if request.method == "POST":
@@ -167,9 +171,7 @@ def test(request, test_id):
         "questions": questions,
         'tests': tests,
         'remaining_seconds': int(remaining_seconds),
-        'total_tests_count': total_tests_count,
-        'active_users_count': active_users_count,
-        'completed_tests_count': completed_tests_count,}
+    }
     return render(request, "test.html", context)
 
 @login_required(login_url='login')
@@ -805,3 +807,36 @@ def generate_certificate(request, checktest_id):
     
     buffer.seek(0)
     return HttpResponse(buffer, content_type='application/pdf')
+
+@login_required(login_url='login')
+def edit_test(request, test_id):
+    test = get_object_or_404(Test, id=test_id, author=request.user)
+    if request.method == 'POST':
+        test.title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        test.category = get_object_or_404(Category, id=category_id)
+        test.maximum_attempts = request.POST.get('maximum_attempts')
+        test.pass_percentage = request.POST.get('pass_percentage')
+        test.duration = request.POST.get('duration', 20)
+        test.save()
+        messages.success(request, "Test muvaffaqiyatli tahrirlandi.")
+        return redirect('test_detail', test_id=test.id)
+    
+    categories = Category.objects.all()
+    return render(request, 'edit_test.html', {'test': test, 'categories': categories})
+
+@login_required(login_url='login')
+def delete_test(request, test_id):
+    test = get_object_or_404(Test, id=test_id, author=request.user)
+    if request.method == 'POST':
+        test.delete()
+        messages.success(request, "Test tizimdan o'chirildi.")
+        return redirect('my_tests')
+    return redirect('test_detail', test_id=test.id)
+
+@login_required(login_url='login')
+def test_results_for_author(request, test_id):
+    test = get_object_or_404(Test, id=test_id, author=request.user)
+    checktests = CheckTest.objects.filter(test=test).order_by('-started_at')
+    
+    return render(request, 'test_results_for_author.html', {'test': test, 'checktests': checktests})

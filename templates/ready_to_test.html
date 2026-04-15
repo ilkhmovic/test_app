@@ -1,63 +1,76 @@
 {% extends "base.html" %}
-{% block title %} Ready to Test {% endblock title %}
+{% block title %} Sinovga tayyorgarlik {% endblock title %}
 {% block content %}
-<div class="content mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Sinovga tayyormisiz: "{{ test.title }}" testi</h3>
-        </div>
-        <div class="card-body">
-            <p class="card-text">
-                <strong>Batafsil:</strong> Bu testda <strong>{{ test.question_set.all.count }}</strong> ta savol bor.
-                <br>Sizda jami <strong>{{ test.maximum_attempts }}</strong> ta urinish bor.
-            </p>
-            <p class="card-text">
-                <strong>Davomiyligi: {{ test.duration }} daqiqa.</strong> Vaqt tugashi bilan test avtomatik yopiladi.
-            </p>
-            <p class="card-text">
-                <strong>Muallif</strong>
-                <a href="{% url 'profile' test.author.username %}" class="text-decoration-none">
-                    @{{ test.author.username }}
-                </a>
-            </p>
-            <p class="card-text">
-                <strong>Kategoriya:</strong> {{ test.category.name }}
-            </p>
-            <p class="card-text">
-                <strong>O'tish foizi:</strong> {{ test.pass_percentage }}%
-            </p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 p-5 text-center position-relative" style="background: var(--primary-gradient) !important; color: white;">
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <span class="badge bg-white text-primary rounded-pill fw-bold">{{ test.category.name }}</span>
+                    </div>
+                    <div class="bg-white text-primary rounded-circle d-inline-flex justify-content-center align-items-center mb-4 shadow" style="width: 80px; height: 80px;">
+                        <i class="fas fa-rocket fa-2x"></i>
+                    </div>
+                    <h2 class="fw-bold mb-2 text-white">{{ test.title }}</h2>
+                    <p class="mb-0 opacity-75">Testni boshlashga tayyormisiz?</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-card">
+                    <div class="row g-4 mb-5">
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 position-relative text-center h-100" style="border-color: var(--border) !important;">
+                                <i class="fas fa-list-ol text-primary mb-2 fs-3"></i>
+                                <h3 class="fw-bold text-main mb-1">{{ test.question_set.all.count }}</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Savollar</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 position-relative text-center h-100" style="border-color: var(--border) !important;">
+                                <i class="fas fa-clock text-primary mb-2 fs-3"></i>
+                                <h3 class="fw-bold text-main mb-1">{{ test.duration }}</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Daqiqa Vaqt</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 position-relative text-center h-100" style="border-color: var(--border) !important;">
+                                <i class="fas fa-sync-alt text-primary mb-2 fs-3"></i>
+                                <h3 class="fw-bold text-main mb-1">{{ test.maximum_attempts }}</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Urinish</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 position-relative text-center h-100" style="border-color: var(--border) !important;">
+                                <i class="fas fa-percentage text-primary mb-2 fs-3"></i>
+                                <h3 class="fw-bold text-success mb-1">{{ test.pass_percentage }}%</h3>
+                                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">O'tish Balli</small>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="mt-4">
-                <a class="btn btn-primary btn-lg" href="{% url 'test' test.id %}">
-                    Testni boshlash
-                </a>
-                <a class="btn btn-outline-secondary" href="{% url 'index' %}">Bekor qilish</a>
+                    <div class="d-flex align-items-center justify-content-center mb-4">
+                        <span class="text-muted me-2">Test muallifi:</span>
+                        <a href="{% url 'profile' test.author.username %}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" style="padding: 2px 12px;">
+                            @{{ test.author.username }}
+                        </a>
+                    </div>
+                    
+                    <div class="alert alert-warning border-0 rounded-3 d-flex align-items-center" style="background: rgba(245, 158, 11, 0.1); color: #b45309;">
+                        <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+                        <small>Test boshlangach, vaqt to'xtatilmaydi. Barcha savollarga javob berishni unutmang!</small>
+                    </div>
+
+                    <div class="d-flex flex-column flex-md-row gap-3 mt-5">
+                        <a href="{% url 'test' test.id %}" class="btn btn-primary btn-lg flex-grow-1 fw-bold fw-bold" style="border-radius: 12px; padding: 14px;">
+                            <i class="fas fa-play-circle me-2"></i> Boshlash
+                        </a>
+                        <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-secondary btn-lg fw-bold" style="border-radius: 12px; padding: 14px;">
+                            Ortga Qaytish
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .card {
-        border: none;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-    }
-
-    .card-header {
-        border-radius: 12px 12px 0 0 !important;
-    }
-
-    .card-text {
-        font-size: 16px;
-        line-height: 1.6;
-        margin-bottom: 15px;
-    }
-
-    .btn-lg {
-        padding: 12px 30px;
-        font-size: 18px;
-        border-radius: 8px;
-    }
-</style>
 {% endblock content %}

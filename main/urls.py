@@ -20,4 +20,7 @@ urlpatterns = [
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('test/<int:test_id>/review/', views.add_review, name='add_review'),
     path('result/<int:checktest_id>/certificate/', views.generate_certificate, name='generate_certificate'),
+    path('test/<int:test_id>/edit/', views.edit_test, name='edit_test'),
+    path('test/<int:test_id>/delete/', views.delete_test, name='delete_test'),
+    path('test/<int:test_id>/results/', views.test_results_for_author, name='test_results_for_author'),
 ]

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %} "{{ test.title }}" Natijalari {% endblock title %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3 border-bottom pb-4" style="border-color: var(--border) !important;">
+                <div>
+                    <h2 class="fw-bold mb-1 d-flex align-items-center">
+                        <i class="fas fa-chart-bar text-primary me-3"></i> Test Natijalari
+                    </h2>
+                    <p class="text-muted mb-0">"{{ test.title }}" testi bo'yicha barcha urinishlar</p>
+                </div>
+                <div>
+                    <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-secondary px-4 fw-bold" style="border-radius: 12px;">
+                        <i class="fas fa-arrow-left me-2"></i> Test Sahifasiga
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-card">
+                <div class="card-body p-0">
+                    {% if checktests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 text-center">
+                            <thead class="bg-light text-muted" style="font-size: 0.85rem; border-color: var(--border) !important;">
+                                <tr>
+                                    <th class="py-4 ps-4 text-start">Foydalanuvchi</th>
+                                    <th class="py-4">Sana va Vaqt</th>
+                                    <th class="py-4">Topilgan Savollar</th>
+                                    <th class="py-4">Natija (%)</th>
+                                    <th class="py-4 pe-4 text-end">Holati</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-main" style="border-top: 1px solid var(--border);">
+                                {% for ct in checktests %}
+                                <tr style="transition: all 0.2s;">
+                                    <td class="py-4 ps-4 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px; font-weight: 800;">
+                                                {{ ct.student.username|first|upper }}
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">@{{ ct.student.username }}</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 text-muted small">
+                                        <i class="far fa-calendar-alt me-1"></i> {{ ct.started_at|date:"d.m.Y" }}<br>
+                                        <i class="far fa-clock me-1"></i> {{ ct.started_at|date:"H:i" }}
+                                    </td>
+                                    <td class="py-4 fw-bold">
+                                        <span class="text-primary">{{ ct.finded_questions }}</span> <span class="text-muted">/ {{ test.question_set.count }}</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="d-flex align-items-center justify-content-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px; width: 60px; border-radius: 10px; background: rgba(0,0,0,0.05);">
+                                                <div class="progress-bar {% if ct.user_passed %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ ct.percentage }}%; border-radius: 10px;"></div>
+                                            </div>
+                                            <span class="fw-bold">{{ ct.percentage }}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 pe-4 text-end">
+                                        {% if ct.user_passed %}
+                                            <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;"><i class="fas fa-check-circle me-1"></i> O'tdi</span>
+                                        {% else %}
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;"><i class="fas fa-times-circle me-1"></i> O'ta olmadi</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 px-4 bg-light bg-opacity-50">
+                        <div class="bg-white text-muted rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-sm" style="width: 80px; height: 80px; font-size: 32px;">
+                            <i class="fas fa-users-slash"></i>
+                        </div>
+                        <h5 class="fw-bold text-main mb-2">Hali Natijalar Yo'q</h5>
+                        <p class="text-muted mb-0">Ushbu test hozircha hech kim tomonidan topshirilmadi.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Stats Summary (Optional Add-on if context allows) -->
+            {% if checktests %}
+            <div class="row mt-4 g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-card d-flex align-items-center flex-row">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 me-3">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0 text-main">{{ checktests.count }}</h4>
+                            <small class="text-muted fw-bold text-uppercase">Urinishlar</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-card { background-color: var(--bg-card); }
+    .text-main { color: var(--text-main); }
+    tr:hover { background-color: rgba(99, 102, 241, 0.02) !important; }
+</style>
+{% endblock %}

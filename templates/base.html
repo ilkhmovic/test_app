@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 
 <head>
     <meta charset="UTF-8">
@@ -9,52 +9,34 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    
+    <!-- Theme Script loaded early to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     {% block extra_css %}{% endblock %}
-
-    <style>
-        /* Footer pastki qismga yopishish uchun */
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex: 1;
-        }
-
-        footer {
-            margin-top: auto;
-        }
-
-        /* Qo'shimcha: Kontent kam bo'lsa markazlashtirish */
-        .min-vh-80 {
-            min-height: 80vh;
-        }
-    </style>
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <nav class="navbar navbar-expand-lg glass-navbar shadow-sm py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">
-                <i class="fas fa-graduation-cap me-2"></i>Test Platformasi
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                Vantage Tests
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <i class="fas fa-bars text-primary" style="font-size: 1.5rem;"></i>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto ps-lg-4">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'index' %}">
                             <i class="fas fa-home me-1"></i> Bosh Sahifa
@@ -71,40 +53,51 @@
                             <i class="fas fa-file-alt me-1"></i> Mening Testlarim
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_test' %}">
                             <i class="fas fa-plus-circle me-1"></i> Test Yaratish
                         </a>
-                    </li>
+                    </li> -->
                     {% endif %}
                 </ul>
 
-                <div class="d-flex align-items-center">
-                    <form class="d-flex me-3" action="{% url 'index' %}" method="get">
-
-                        <input class="form-control me-2" type="search" placeholder="Testlarni qidirish..."
-                            aria-label="Search" name="q">
-                        <button class="btn btn-outline-light" type="submit">Qidirish</button>
+                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                    <!-- Search Form -->
+                    <form class="input-group" action="{% url 'index' %}" method="get" style="width: 250px;">
+                        <input class="form-control" type="search" placeholder="Qidirish..." name="q" aria-label="Search" style="border-right: none;">
+                        <button class="btn btn-primary px-3" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </form>
+
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle-btn" id="theme-toggle" title="Mavzuni o'zgartirish">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
 
                     {% if user.is_authenticated %}
                     <div class="dropdown">
-                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-1"></i> {{ user.username }}
+                        <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle fs-5"></i> <span>{{ user.username }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border);">
                             <li>
-                                <a class="dropdown-item" href="{% url 'profile' user.username %}">
-                                    <i class="fas fa-user-circle me-2"></i> Profil
+                                <a class="dropdown-item d-flex align-items-center mb-1" href="{% url 'profile' user.username %}" style="color: var(--text-main);">
+                                    <i class="fas fa-user text-primary me-2"></i> Profil
                                 </a>
                             </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item d-flex align-items-center mb-1" href="{% url 'create_test' %}" style="color: var(--text-main);">
+                                    <i class="fas fa-plus text-success me-2"></i> Yangi Test
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" style="border-color: var(--border);">
                             </li>
                             <li>
                                 <form method="post" action="{% url 'logout' %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-danger">
+                                    <button type="submit" class="dropdown-item text-danger d-flex align-items-center">
                                         <i class="fas fa-sign-out-alt me-2"></i> Chiqish
                                     </button>
                                 </form>
@@ -112,13 +105,9 @@
                         </ul>
                     </div>
                     {% else %}
-                    <div class="btn-group">
-                        <a href="{% url 'login' %}" class="btn btn-outline-light me-2">
-                            <i class="fas fa-sign-in-alt me-1"></i> Kirish
-                        </a>
-                        <a href="{% url 'signup' %}" class="btn btn-light text-primary">
-                            <i class="fas fa-user-plus me-1"></i> Ro'yxatdan o'tish
-                        </a>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">Kirish</a>
+                        <a href="{% url 'signup' %}" class="btn btn-primary">Ro'yxatdan o'tish</a>
                     </div>
                     {% endif %}
                 </div>
@@ -127,115 +116,108 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow-1">
+    <main class="flex-grow-1 py-4">
         {% block content %}
         {% endblock content %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-auto">
+    <!-- Premium Footer -->
+    <footer class="premium-footer">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-graduation-cap me-2"></i>Test Platformasi
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="mb-3 d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex justify-content-center align-items-center" style="width: 32px; height: 32px; font-size: 14px;">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        Vantage Tests
                     </h5>
-                    <p class="text-light-50">
-                        O'z bilimingizni sinab ko'ring va yangi testlar yarating.
-                        Bilim - kuch!
+                    <p class="text-muted pe-lg-4">
+                        Zamonaviy, tezkor va interaktiv test platformasi. O'z bilimingizni sinab ko'ring yoki boshqalar uchun testlar yarating.
                     </p>
-                    <div class="social-links">
-                        <a href="#" class="text-light me-3"><i class="fab fa-telegram fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-youtube fa-lg"></i></a>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px; padding: 8px;"><i class="fab fa-telegram text-primary fs-5"></i></a>
+                        <a href="#" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px; padding: 8px;"><i class="fab fa-instagram text-danger fs-5"></i></a>
+                        <a href="#" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px; padding: 8px;"><i class="fab fa-facebook text-info fs-5"></i></a>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="fw-bold mb-3">Tez Havolalar</h6>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3">Sahifalar</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <a href="{% url 'index' %}" class="text-light-50 text-decoration-none">Bosh Sahifa</a>
-                        </li>
-                        {% if user.is_authenticated %}
-                        <li class="mb-2">
-                            <a href="{% url 'my_tests' %}" class="text-light-50 text-decoration-none">Mening
-                                Testlarim</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{% url 'create_test' %}" class="text-light-50 text-decoration-none">Test
-                                Yaratish</a>
-                        </li>
-                        {% else %}
-                        <li class="mb-2">
-                            <a href="{% url 'login' %}" class="text-light-50 text-decoration-none">Kirish</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{% url 'signup' %}" class="text-light-50 text-decoration-none">Ro'yxatdan
-                                o'tish</a>
-                        </li>
+                        <li class="mb-2"><a href="{% url 'index' %}" class="text-decoration-none">Bosh Sahifa</a></li>
+                        <li class="mb-2"><a href="{% url 'leaderboard' %}" class="text-decoration-none">Reytinglar</a></li>
+                        {% if not user.is_authenticated %}
+                        <li class="mb-2"><a href="{% url 'login' %}" class="text-decoration-none">Kirish</a></li>
+                        <li class="mb-2"><a href="{% url 'signup' %}" class="text-decoration-none">Ro'yxatdan o'tish</a></li>
                         {% endif %}
                     </ul>
                 </div>
 
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6 class="fw-bold mb-3">Statistika</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <span class="text-light-50">Jami Testlar: {% if total_tests_count %}{{ total_tests_count
-                                }}{% else %}0{% endif %}</span>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3">Platforma Statistikasi</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="fas fa-file-alt text-primary me-2"></i> Jami Testlar: <strong class="ms-auto text-main">{{ total_tests_count|default:"0" }}</strong>
                         </li>
-                        <li class="mb-2">
-                            <span class="text-light-50">Faol Foydalanuvchilar: {% if active_users_count %}{{
-                                active_users_count }}{% else %}0{% endif %}</span>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="fas fa-users text-success me-2"></i> Foydalanuvchilar: <strong class="ms-auto text-main">{{ active_users_count|default:"0" }}</strong>
                         </li>
-                        <li class="mb-2">
-                            <span class="text-light-50">Topshirilgan Testlar: {% if completed_tests_count %}{{
-                                completed_tests_count }}{% else %}0{% endif %}</span>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="fas fa-check-circle text-info me-2"></i> Yechilganlar: <strong class="ms-auto text-main">{{ completed_tests_count|default:"0" }}</strong>
                         </li>
                     </ul>
                 </div>
 
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6 class="fw-bold mb-3">Aloqa</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-envelope me-2"></i>
-                            <span class="text-light-50">info@testapp.uz</span>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-phone me-2"></i>
-                            <span class="text-light-50">+998 90 123 45 67</span>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            <span class="text-light-50">Toshkent, O'zbekiston</span>
-                        </li>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3">Aloqa</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> yordam@vantage.uz</li>
+                        <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i> +998 90 123 45 67</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt text-primary me-2"></i> Toshkent, O'zbekiston</li>
                     </ul>
                 </div>
             </div>
 
-            <hr class="bg-light my-4">
+            <hr style="border-color: var(--border);" class="my-4">
 
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0 text-light-50">
-                        &copy; 2024 Test Platformasi. Barcha huquqlar himoyalangan.
-                    </p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <p class="mb-0 text-light-50">
-                        Biz bilan bilimingizni oshiring!
-                    </p>
-                </div>
+            <div class="text-center text-muted col-12">
+                <small>&copy; 2024 Vantage Test Platformasi. Barcha huquqlar himoyalangan.</small>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'scripts.js' %}"></script>
+    
+    <!-- Theme Toggle Javascript -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        function updateIcon(theme) {
+            if(theme === 'dark') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIcon.classList.add('text-warning');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.remove('text-warning');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        updateIcon(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
-
 </html>

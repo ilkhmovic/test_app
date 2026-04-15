@@ -14,142 +14,175 @@
 
     .rating label {
         cursor: pointer;
-        font-size: 30px;
-        color: #ccc;
+        font-size: 32px;
+        color: var(--border);
         transition: color 0.2s;
+        margin-right: 5px;
     }
 
     .rating label:hover,
     .rating label:hover~label,
     .rating input:checked~label {
-        color: #ffc107;
+        color: var(--warning);
+    }
+    
+    .result-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .score-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 8px solid rgba(255,255,255,0.2);
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
 </style>
-<div class="content mt-3">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Test Natijasi: {{ checktest.test.title }}</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Natija ma'lumotlari:</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <strong>To'g'ri javoblar:</strong>
-                            <span class="badge bg-success">{{ checktest.finded_questions }}</span>
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Umumiy savollar:</strong>
-                            <span class="badge bg-info">{{ check_questions.count }}</span>
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Foiz:</strong>
-                            <span class="badge bg-warning text-dark">{{ checktest.percentage }}%</span>
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Test o'tish foizi:</strong>
-                            <span class="badge bg-secondary">{{ checktest.test.pass_percentage }}%</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h5>Holat:</h5>
-                    <div class="alert {% if checktest.user_passed %}alert-success{% else %}alert-danger{% endif %}">
+
+<div class="container py-4">
+    <!-- Natija xulosasi -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-card text-center relative position-relative">
+                <div class="p-5 text-white" style="background: {% if checktest.user_passed %}var(--success){% else %}var(--danger){% endif %} !important;">
+                    <div class="mb-4">
                         {% if checktest.user_passed %}
-                        <h4 class="alert-heading">Tabriklaymiz! ✅</h4>
-                        <p class="mb-0">Siz testdan muvaffaqiyatli o'tdingiz!</p>
+                            <div class="score-circle bg-white text-success bg-opacity-25 backdrop-blur">
+                                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <h1 class="display-5 fw-bold mb-0">{{ checktest.percentage }}%</h1>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mt-4 mb-2">Tabriklaymiz! 🎉</h2>
+                            <p class="fs-5 opacity-75 mb-0">Siz testdan muvaffaqiyatli o'tdingiz.</p>
                         {% else %}
-                        <h4 class="alert-heading">Afsuski ❌</h4>
-                        <p class="mb-0">Siz testdan o'ta olmadingiz. Qayta urinib ko'ring!</p>
+                            <div class="score-circle bg-white text-danger bg-opacity-25 backdrop-blur">
+                                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <h1 class="display-5 fw-bold mb-0">{{ checktest.percentage }}%</h1>
+                                </div>
+                            </div>
+                            <h2 class="fw-bold mt-4 mb-2">Afsuski 😔</h2>
+                            <p class="fs-5 opacity-75 mb-0">Siz yetarlicha ball to'play olmadingiz. Testdan o'tish uchun {{ checktest.test.pass_percentage }}% kerak.</p>
                         {% endif %}
                     </div>
-
                 </div>
-
-                {% if checktest.user_passed %}
-                <div class="mt-3">
-                    <a href="{% url 'generate_certificate' checktest.id %}" class="btn btn-success w-100">
-                        <i class="fas fa-certificate"></i> Sertifikat Yuklash
-                    </a>
-                </div>
-                {% endif %}
-
-                <div class="mt-2">
-                    <a href="https://t.me/share/url?url=http://127.0.0.1:8000/&text=Men {{ checktest.test.title }} testidan {{ checktest.percentage }}% natija oldim! Senga ham tavsiya qilaman."
-                        target="_blank" class="btn btn-info text-white w-100">
-                        <i class="fab fa-telegram-plane"></i> Natijani Ulashish
-                    </a>
+                
+                <div class="card-body p-4 p-md-5">
+                    <h4 class="fw-bold text-main mb-4">{{ checktest.test.title }}</h4>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 border rounded-4 bg-primary bg-opacity-10 border-primary border-opacity-25">
+                                <h3 class="fw-bold text-primary mb-1">{{ check_questions.count }}</h3>
+                                <small class="text-primary text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Jami savol</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-4 bg-success bg-opacity-10 border-success border-opacity-25">
+                                <h3 class="fw-bold text-success mb-1">{{ checktest.finded_questions }}</h3>
+                                <small class="text-success text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">To'g'ri javob</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-column flex-md-row gap-3 mt-4">
+                        {% if checktest.user_passed %}
+                        <a href="{% url 'generate_certificate' checktest.id %}" class="btn btn-success btn-lg flex-grow-1 fw-bold rounded-3">
+                            <i class="fas fa-certificate me-2"></i> Sertifikatni Yuklash
+                        </a>
+                        {% endif %}
+                        <a href="https://t.me/share/url?url=http://127.0.0.1:8000/ready_to_test/{{ checktest.test.id }}&text=Men {{ checktest.test.title }} testidan {{ checktest.percentage }}% natija oldim! Sen ham topshirib ko'r!" target="_blank" class="btn btn-info text-white btn-lg flex-grow-1 fw-bold rounded-3">
+                            <i class="fab fa-telegram-plane me-2"></i> Natijani Ulashish
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="card mt-4">
-    <div class="card-header bg-secondary text-white">
-        <h5 class="mb-0">Test haqida fikringiz</h5>
-    </div>
-    <div class="card-body">
-        <form action="{% url 'add_review' checktest.test.id %}" method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label">Bahoyingiz:</label>
-                <div class="rating">
-                    <input type="radio" name="rating" value="5" id="r5"><label for="r5">★</label>
-                    <input type="radio" name="rating" value="4" id="r4"><label for="r4">★</label>
-                    <input type="radio" name="rating" value="3" id="r3"><label for="r3">★</label>
-                    <input type="radio" name="rating" value="2" id="r2"><label for="r2">★</label>
-                    <input type="radio" name="rating" value="1" id="r1"><label for="r1">★</label>
+    <!-- Rating Section -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="result-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-main mb-2">Test haqida qanday fikrdasiz?</h4>
+                    <p class="text-muted">Sizning bahoingiz muallif uchun muhim</p>
                 </div>
+                <form action="{% url 'add_review' checktest.test.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="rating">
+                            <input type="radio" name="rating" value="5" id="r5"><label for="r5">★</label>
+                            <input type="radio" name="rating" value="4" id="r4"><label for="r4">★</label>
+                            <input type="radio" name="rating" value="3" id="r3"><label for="r3">★</label>
+                            <input type="radio" name="rating" value="2" id="r2"><label for="r2">★</label>
+                            <input type="radio" name="rating" value="1" id="r1"><label for="r1">★</label>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <textarea name="comment" class="form-control" rows="3" placeholder="O'z fikringizni yozing..." style="border-radius: 12px;" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 12px;">Baholash</button>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <textarea name="comment" class="form-control" rows="3" placeholder="Fikringizni yozing..."
-                    required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Yuborish</button>
-        </form>
-    </div>
-</div>
-
-<hr>
-
-
-<h5>Savol va javoblar:</h5>
-<div class="mt-3">
-    {% for check_question in check_questions %}
-    <div class="card mb-2 {% if check_question.is_true %}border-success{% else %}border-danger{% endif %}">
-        <div class="card-body">
-            <h6>{{ forloop.counter }}. {{ check_question.question.question }}</h6>
-            <p><strong>Sizning javobingiz:</strong>
-                <span class="{% if check_question.is_true %}text-success{% else %}text-danger{% endif %}">
-                    {{ check_question.given_answer|upper }} - {{ check_question.question.a }}
-                </span>
-            </p>
-            {% if not check_question.is_true %}
-            <p><strong>To'g'ri javob:</strong>
-                <span class="text-success">{{ check_question.true_answer|upper }} -
-                    {% if check_question.true_answer == 'a' %}{{ check_question.question.a }}
-                    {% elif check_question.true_answer == 'b' %}{{ check_question.question.b }}
-                    {% elif check_question.true_answer == 'c' %}{{ check_question.question.c }}
-                    {% elif check_question.true_answer == 'd' %}{{ check_question.question.d }}
-                    {% endif %}
-                </span>
-            </p>
-            {% endif %}
-            <span class="badge {% if check_question.is_true %}bg-success{% else %}bg-danger{% endif %}">
-                {% if check_question.is_true %}To'g'ri{% else %}Noto'g'ri{% endif %}
-            </span>
         </div>
     </div>
-    {% endfor %}
-</div>
 
-<div class="mt-4">
-    <a href="{% url 'index' %}" class="btn btn-primary">Bosh sahifaga qaytish</a>
-    <a href="{% url 'ready_to_test' checktest.test.id %}" class="btn btn-outline-secondary">Qayta urinish</a>
-</div>
-</div>
-</div>
+    <!-- Savol javoblar analizi -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h4 class="fw-bold mb-4 border-bottom pb-3"><i class="fas fa-list-check text-primary me-2"></i> Savol-javoblar Tahlili</h4>
+            
+            <div class="d-flex flex-column gap-3 mb-5">
+                {% for check_question in check_questions %}
+                <div class="result-card p-4 {% if check_question.is_true %}border-success bg-success bg-opacity-10{% else %}border-danger bg-danger bg-opacity-10{% endif %}" style="border-width: 2px;">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h6 class="fw-bold mb-0" style="line-height: 1.5; font-size: 1.1rem; color: var(--text-main);">
+                            <span class="me-2">{{ forloop.counter }}.</span> {{ check_question.question.question }}
+                        </h6>
+                        {% if check_question.is_true %}
+                            <span class="badge bg-success ms-3 flex-shrink-0"><i class="fas fa-check"></i> To'g'ri</span>
+                        {% else %}
+                            <span class="badge bg-danger ms-3 flex-shrink-0"><i class="fas fa-times"></i> Xato</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="p-3 rounded-3 bg-card mt-3">
+                        <p class="mb-1 text-main">
+                            <span class="text-muted fw-bold me-2">Sizning javobingiz:</span>
+                            <span class="fw-bold {% if check_question.is_true %}text-success{% else %}text-danger{% endif %} text-uppercase">
+                                {{ check_question.given_answer }}
+                            </span>
+                        </p>
+                        
+                        {% if not check_question.is_true %}
+                        <p class="mb-0 text-main mt-2 border-top pt-2" style="border-color: var(--border) !important;">
+                            <span class="text-muted fw-bold me-2">To'g'ri javob:</span>
+                            <span class="text-success fw-bold text-uppercase">{{ check_question.true_answer }}</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="d-flex justify-content-center gap-3 mt-4 mb-5">
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary px-4 py-2 fw-bold" style="border-radius: 12px;">
+                    Bosh sahifaga qaytish
+                </a>
+                <a href="{% url 'ready_to_test' checktest.test.id %}" class="btn btn-primary px-4 py-2 fw-bold" style="border-radius: 12px;">
+                    <i class="fas fa-redo me-2"></i> Qayta urinish
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}

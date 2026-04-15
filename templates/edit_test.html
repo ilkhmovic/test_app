@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %} Testni Tahrirlash {% endblock title %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-card">
+                <!-- Header with Warning Gradient (Edit usually uses yellow/warning) -->
+                <div class="p-4 p-md-5 text-dark" style="background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="bg-white text-warning rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px; font-size: 20px;">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-bold mb-0 text-dark">Testni Tahrirlash</h2>
+                            <p class="mb-0 opacity-75">Mavjud test ma'lumotlarini o'zgartirish</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="title">Test Nomi</label>
+                                <input type="text" id="title" name="title" class="form-control form-control-lg" value="{{ test.title }}" style="border-radius: 12px;" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="category">Toifa</label>
+                                <select id="category" name="category" class="form-select form-select-lg" style="border-radius: 12px;" required>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.id }}" {% if test.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="maximum_attempts">Urinishlar soni</label>
+                                <input type="number" id="maximum_attempts" name="maximum_attempts" class="form-control form-control-lg" value="{{ test.maximum_attempts }}" min="1" style="border-radius: 12px;" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="pass_percentage">O'tish foizi (%)</label>
+                                <input type="number" id="pass_percentage" name="pass_percentage" class="form-control form-control-lg" value="{{ test.pass_percentage }}" min="0" max="100" style="border-radius: 12px;" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="duration">Davomiyligi (daqiqada)</label>
+                                <input type="number" id="duration" name="duration" class="form-control form-control-lg" value="{{ test.duration }}" min="1" style="border-radius: 12px;" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 pt-4 border-top d-flex flex-column flex-md-row justify-content-between gap-3" style="border-color: var(--border) !important;">
+                            <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-secondary btn-lg px-4 fw-bold" style="border-radius: 12px;">
+                                <i class="fas fa-arrow-left me-2"></i> Bekor qilish
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-lg px-5 fw-bold text-dark" style="border-radius: 12px; background: #f59e0b; border: none;">
+                                <i class="fas fa-save me-2"></i> Saqlash
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

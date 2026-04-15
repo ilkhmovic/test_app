@@ -2,82 +2,92 @@
 {% block title %} Savol Qo'shish - {{ test.title }} {% endblock title %}
 {% block content %}
 <div class="container py-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5 bg-card">
+        <!-- Header with Gradient -->
+        <div class="p-4 p-md-5 text-white" style="background: var(--primary-gradient) !important;">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">
-                    <i class="fas fa-plus-circle me-2"></i>
-                    {{ test.title }} - Yangi Savol Qo'shish
-                </h3>
-                <span class="badge bg-light text-dark">{{ test.question_set.count }} savol</span>
+                <div class="d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0 text-white">Yangi Savol Qo'shish</h2>
+                        <p class="mb-0 opacity-75">{{ test.title }}</p>
+                    </div>
+                </div>
+                <div class="text-end d-none d-md-block">
+                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold shadow-sm">
+                        <i class="fas fa-list-ul me-1"></i> {{ test.question_set.count }} ta mavjud savol
+                    </span>
+                </div>
             </div>
         </div>
-        <div class="card-body">
+
+        <div class="card-body p-4 p-md-5">
             <form method="post" id="questionForm">
                 {% csrf_token %}
                 
                 <!-- Savol matni -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Savol Matni</label>
-                    <textarea name="question" class="form-control" rows="4" 
-                              placeholder="Savol matnini kiriting..." required
-                              style="border-radius: 10px; border: 2px solid #e9ecef;" id="questionInput"></textarea>
+                <div class="mb-5">
+                    <label class="form-label fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 1px;">Savol Matni</label>
+                    <textarea name="question" class="form-control form-control-lg" rows="4" 
+                              placeholder="Savol matnini bu yerga kiriting..." required
+                              style="border-radius: 16px; font-size: 1.1rem; padding: 20px;" id="questionInput"></textarea>
                 </div>
                 
                 <!-- Variantlar -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold text-success">A Variant</label>
-                        <input type="text" name="a" class="form-control" placeholder="A variant matni" required
-                               id="aInput">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">A</span>
+                            <input type="text" name="a" class="form-control" placeholder="A variant matni" style="border-radius: 0 12px 12px 0;" required id="aInput">
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold text-success">B Variant</label>
-                        <input type="text" name="b" class="form-control" placeholder="B variant matni" required
-                               id="bInput">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">B</span>
+                            <input type="text" name="b" class="form-control" placeholder="B variant matni" style="border-radius: 0 12px 12px 0;" required id="bInput">
+                        </div>
                     </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold text-success">C Variant</label>
-                        <input type="text" name="c" class="form-control" placeholder="C variant matni" required
-                               id="cInput">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">C</span>
+                            <input type="text" name="c" class="form-control" placeholder="C variant matni" style="border-radius: 0 12px 12px 0;" required id="cInput">
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold text-success">D Variant</label>
-                        <input type="text" name="d" class="form-control" placeholder="D variant matni" required
-                               id="dInput">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">D</span>
+                            <input type="text" name="d" class="form-control" placeholder="D variant matni" style="border-radius: 0 12px 12px 0;" required id="dInput">
+                        </div>
                     </div>
                 </div>
                 
                 <!-- To'g'ri javob -->
-                <div class="row">
+                <div class="row mt-4">
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-danger">To'g'ri Javob</label>
-                        <select name="true_answer" class="form-control" required id="trueAnswerSelect">
-                            <option value="">To'g'ri javobni tanlang</option>
-                            <option value="a">A variant</option>
-                            <option value="b">B variant</option>
-                            <option value="c">C variant</option>
-                            <option value="d">D variant</option>
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing: 1px;">To'g'ri Javobni Tanlang</label>
+                        <select name="true_answer" class="form-select form-select-lg" style="border-radius: 12px;" required id="trueAnswerSelect">
+                            <option value="">Tanlang...</option>
+                            <option value="a">A Varianti</option>
+                            <option value="b">B Varianti</option>
+                            <option value="c">C Varianti</option>
+                            <option value="d">D Varianti</option>
                         </select>
                     </div>
                 </div>
                 
                 <!-- Tugmalar -->
-                <div class="mt-4 pt-3 border-top">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button type="submit" class="btn btn-success btn-lg" id="saveBtn">
-                            <i class="fas fa-save me-2"></i> Savolni Saqlash
-                        </button>
-                        <button type="button" class="btn btn-outline-primary btn-lg" id="saveAndNewBtn">
-                            <i class="fas fa-plus me-2"></i> Saqlab va Yangi Qo'shish
-                        </button>
-                        <a href="{% url 'mass_create_questions' test.id %}" class="btn btn-outline-secondary btn-lg">
-                            <i class="fas fa-arrow-left me-2"></i> Orqaga
-                        </a>
-                    </div>
+                <div class="mt-5 pt-4 border-top d-flex flex-wrap gap-3" style="border-color: var(--border) !important;">
+                    <button type="submit" class="btn btn-success btn-lg px-4 fw-bold" style="border-radius: 12px;" id="saveBtn">
+                        <i class="fas fa-save me-2"></i> Saqlash
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-lg px-4 fw-bold" style="border-radius: 12px;" id="saveAndNewBtn">
+                        <i class="fas fa-plus me-2"></i> Saqlab va Yangi Qo'shish
+                    </button>
+                    <a href="{% url 'mass_create_questions' test.id %}" class="btn btn-outline-secondary btn-lg px-4 fw-bold ms-md-auto" style="border-radius: 12px;">
+                        <i class="fas fa-arrow-left me-2"></i> Orqaga
+                    </a>
                 </div>
             </form>
         </div>
@@ -98,34 +108,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let saveAndNew = false;
     
-    // "Saqlab va Yangi Qo'shish" tugmasi
     saveAndNewBtn.addEventListener('click', function() {
         if (validateForm()) {
             saveAndNew = true;
             setLoadingState(true);
-            
-            // Form ma'lumotlarini yuborish
             const formData = new FormData(form);
-            
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => {
                 if (response.ok) {
-                    // Formni tozalash
                     clearForm();
                     setLoadingState(false);
                     saveAndNew = false;
-                    
-                    // Xabar ko'rsatish
                     showMessage('Savol muvaffaqiyatli saqlandi! Yangi savol qo\'shishingiz mumkin.', 'success');
-                } else {
-                    throw new Error('Server xatosi');
-                }
+                } else throw new Error('Server xatosi');
             })
             .catch(error => {
                 setLoadingState(false);
@@ -135,136 +134,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Oddiy saqlash
     form.addEventListener('submit', function(e) {
-        if (!saveAndNew) {
-            setLoadingState(true);
-            // Oddiy saqlash - form normal tarzda yuboriladi
-        } else {
-            e.preventDefault();
-        }
+        if (!saveAndNew) setLoadingState(true);
+        else e.preventDefault();
     });
     
-    // Formni tekshirish
     function validateForm() {
         const inputs = [questionInput, aInput, bInput, cInput, dInput, trueAnswerSelect];
         let isValid = true;
-        
         inputs.forEach(input => {
             if (!input.value.trim()) {
-                input.style.borderColor = 'red';
+                input.classList.add('is-invalid');
                 isValid = false;
-            } else {
-                input.style.borderColor = '';
-            }
+            } else input.classList.remove('is-invalid');
         });
-        
-        if (!isValid) {
-            showMessage('Iltimos, barcha maydonlarni to\'ldiring!', 'error');
-        }
-        
+        if (!isValid) showMessage('Iltimos, barcha maydonlarni to\'ldiring!', 'error');
         return isValid;
     }
     
-    // Formni tozalash
     function clearForm() {
-        questionInput.value = '';
-        aInput.value = '';
-        bInput.value = '';
-        cInput.value = '';
-        dInput.value = '';
-        trueAnswerSelect.value = '';
-        
-        // Fokusni savol maydoniga qaytarish
+        [questionInput, aInput, bInput, cInput, dInput, trueAnswerSelect].forEach(i => i.value = '');
         questionInput.focus();
     }
     
-    // Yuklash holatini o'rnatish
     function setLoadingState(loading) {
         if (loading) {
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saqlanmoqda...';
-            saveBtn.disabled = true;
-            saveAndNewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saqlanmoqda...';
-            saveAndNewBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            saveAndNewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            [saveBtn, saveAndNewBtn].forEach(b => b.disabled = true);
         } else {
-            saveBtn.innerHTML = '<i class="fas fa-save me-2"></i> Savolni Saqlash';
-            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save me-2"></i> Saqlash';
             saveAndNewBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Saqlab va Yangi Qo\'shish';
-            saveAndNewBtn.disabled = false;
+            [saveBtn, saveAndNewBtn].forEach(b => b.disabled = false);
         }
     }
     
-    // Xabar ko'rsatish
     function showMessage(message, type) {
-        // Mavjud xabarlarni olib tashlash
         const existingAlerts = document.querySelectorAll('.custom-alert');
-        existingAlerts.forEach(alert => alert.remove());
-        
+        existingAlerts.forEach(a => a.remove());
         const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
         const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-        
         const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${alertClass} alert-dismissible fade show custom-alert`;
-        alertDiv.innerHTML = `
-            <i class="fas ${icon} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        form.parentNode.insertBefore(alertDiv, form);
-        
-        // 3 soniyadan so'ng xabarni olib tashlash
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 3000);
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show custom-alert shadow-sm border-0 position-fixed top-0 start-50 translate-middle-x mt-4`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.borderRadius = '12px';
+        alertDiv.innerHTML = `<i class="fas ${icon} me-2"></i> ${message} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 4000);
     }
-    
-    // Input lardagi border rangini tiklash
-    const inputs = [questionInput, aInput, bInput, cInput, dInput, trueAnswerSelect];
-    inputs.forEach(input => {
-        input.addEventListener('input', function() {
-            if (this.value.trim()) {
-                this.style.borderColor = '';
-            }
-        });
-    });
 });
 </script>
 
 <style>
-.card {
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-.form-control {
-    border-radius: 8px;
-    border: 2px solid #e9ecef;
-    transition: border-color 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-.btn-lg {
-    padding: 12px 24px;
-    font-size: 16px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.btn-lg:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.custom-alert {
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
+    .bg-card { background-color: var(--bg-card); }
+    .is-invalid { border-color: var(--danger) !important; }
 </style>
 {% endblock %}

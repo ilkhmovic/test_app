@@ -3,102 +3,43 @@
 {% block title %} Ro'yxatdan o'tish {% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center m-5 align-items-center min-vh-50">
-        <div class="col-md-6 col-lg-5 ">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header  bg-primary text-white text-center py-3">
-                    <h4 class="mb-0">
-                        <i class="fas fa-user-plus me-2"></i>
-                        Yangi Hisob Yaratish
-                    </h4>
+<div class="container d-flex align-items-center justify-content-center py-5" style="min-height: 70vh;">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <!-- Header with Gradient -->
+                <div class="bg-primary text-white text-center py-4" style="background: var(--primary-gradient) !important;">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle mb-3" style="width: 60px; height: 60px; font-size: 24px;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">Yangi Hisob Ochish</h3>
+                    <p class="mb-0 opacity-75 mt-1 small">Platformamizdan to'liq foydalanish imkoniyati</p>
                 </div>
-                <div class="card-body p-4">
+                
+                <div class="card-body p-4 p-md-5">
                     <form method="post">
                         {% csrf_token %}
-                        
-                        {% for field in form %}
-                        <div class="mb-3">
-                            {{ field|as_crispy_field }}
+                        <div class="crispy-form-wrapper">
+                            {{ form|crispy }}
                         </div>
-                        {% endfor %}
                         
-                        <button type="submit" class="btn btn-success w-100 py-2 mb-3">
-                            <i class="fas fa-check-circle me-2"></i> Ro'yxatdan o'tish
+                        <button type="submit" class="btn btn-primary w-100 mt-4 py-2 fw-bold" style="border-radius: 12px; font-size: 1.1rem;">
+                            <i class="fas fa-user-check me-2"></i> Ro'yxatdan o'tish
                         </button>
                         
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Hisobingiz bormi? 
-                                <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Tizimga kirish</a>
-                            </small>
+                        <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border) !important;">
+                            <p class="text-muted mb-0">Biz bilanmisiz? 
+                                <a href="{% url 'login' %}" class="fw-bold ms-1 text-decoration-none">Kirish</a>
+                            </p>
                         </div>
                     </form>
                 </div>
             </div>
+            
+            <div class="mt-4 text-center">
+                <a href="{% url 'index' %}" class="text-muted text-decoration-none"><i class="fas fa-arrow-left me-1"></i> Bosh sahifaga qaytish</a>
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-.login-card {
-    border: none;
-    border-radius: 15px;
-    margin-top: 50px;
-    margin-bottom: 50px;
-}
-
-.card-header {
-    border-radius: 15px 15px 0 0 !important;
-}
-
-.btn-login {
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* Form elementlarini yaxshilash */
-.form-control {
-    border-radius: 8px;
-    padding: 10px 15px;
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-/* Responsive dizayn */
-@media (max-width: 768px) {
-    .col-md-6 {
-        margin: 0 15px;
-    }
-    
-    .login-card {
-        margin-top: 30px;
-        margin-bottom: 30px;
-    }
-}
-
-/* Orqa fon uchun */
-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-</style>
 {% endblock content %}

@@ -1,41 +1,75 @@
 {% extends "base.html" %}
 {% block title %} Mening Testlarim {% endblock title %}
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Mening Testlarim</h2>
-        <a href="{% url 'create_test' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Yangi Test
-        </a>
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 border-bottom pb-4" style="border-color: var(--border) !important;">
+        <div>
+            <h2 class="fw-bold mb-1 d-flex align-items-center">
+                <i class="fas fa-folder-open text-primary me-3"></i> Mening Testlarim
+            </h2>
+            <p class="text-muted mb-0">Siz yaratgan barcha testlar ro'yxati</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'create_test' %}" class="btn btn-primary btn-lg fw-bold px-4 hover-lift" style="border-radius: 12px;">
+                <i class="fas fa-plus me-2"></i> Yangi Test Yaratish
+            </a>
+        </div>
     </div>
     
     {% if user_tests %}
-        <div class="row">
+        <div class="row g-4">
             {% for test in user_tests %}
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">{{ test.title }}</h5>
+            <div class="col-xl-4 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden bg-card hover-card" style="transition: all 0.3s ease;">
+                    <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">{{ test.category.name }}</span>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border fw-normal" style="border-color: var(--border) !important;">
+                                <i class="fas fa-users me-1"></i> {{ test.checktest_set.count }} ta natija
+                            </span>
+                        </div>
+                        <h5 class="fw-bold mb-0">
+                            <a href="{% url 'test_detail' test.id %}" class="text-decoration-none text-main stretched-link" style="position: relative; z-index: 2;">{{ test.title }}</a>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">
-                            <strong>Kategoriya:</strong> {{ test.category.name }}<br>
-                            <strong>Savollar soni:</strong> {{ test.question_set.count }}<br>
-                            <strong>Urinishlar:</strong> {{ test.maximum_attempts }}<br>
-                            <strong>O'tish foizi:</strong> {{ test.pass_percentage }}%<br>
-                            <strong>Vaqt:</strong> {{ test.start_date|date:"d.m.Y H:i" }} - {{ test.end_date|date:"d.m.Y H:i" }}
-                        </p>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="bg-main rounded-3 p-2 text-center" style="border: 1px solid var(--border);">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Savollar</small>
+                                    <span class="fw-bold text-main">{{ test.question_set.count }} ta</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-main rounded-3 p-2 text-center" style="border: 1px solid var(--border);">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Urinishlar</small>
+                                    <span class="fw-bold text-main">{{ test.maximum_attempts }} ta</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-main rounded-3 p-2 text-center" style="border: 1px solid var(--border);">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">O'tish Foizi</small>
+                                    <span class="fw-bold text-success">{{ test.pass_percentage }}%</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-main rounded-3 p-2 text-center" style="border: 1px solid var(--border);">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Vaqt</small>
+                                    <span class="fw-bold text-main">{{ test.duration }} daq</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-0 mt-3 border-top pt-3" style="border-color: var(--border) !important;">
+                            <small class="text-muted d-block text-truncate w-100"><i class="far fa-calendar-alt me-1"></i> {{ test.start_date|date:"d.m.Y H:i" }} - {{ test.end_date|date:"d.m.Y H:i" }}</small>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-primary btn-sm">
+                    <div class="card-footer bg-transparent border-top-0 pb-4 pt-0 d-flex gap-2 position-relative" style="z-index: 3;">
+                        <a href="{% url 'test_detail' test.id %}" class="btn btn-primary flex-grow-1 fw-bold" style="border-radius: 8px;">
                             Batafsil
                         </a>
-                        <a href="{% url 'ready_to_test' test.id %}" class="btn btn-outline-success btn-sm">
-                            Testni ko'rish
+                        <a href="{% url 'ready_to_test' test.id %}" class="btn btn-outline-success fw-bold" style="border-radius: 8px;">
+                            <i class="fas fa-play"></i>
                         </a>
-                        <span class="badge bg-secondary float-end">
-                            {{ test.checktest_set.count }} ta topshirilgan
-                        </span>
                     </div>
                 </div>
             </div>
@@ -43,17 +77,25 @@
         </div>
     {% else %}
         <div class="text-center py-5">
-            <div class="card">
-                <div class="card-body py-5">
-                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">Hali test yaratilmagan</h4>
-                    <p class="text-muted">Birinchi testingizni yarating!</p>
-                    <a href="{% url 'create_test' %}" class="btn btn-primary mt-3">
-                        <i class="fas fa-plus"></i> Yangi Test Yaratish
-                    </a>
+            <div class="card border-0 shadow-sm bg-card rounded-4 d-inline-block p-5 text-center mt-3">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex justify-content-center align-items-center mb-4" style="width: 80px; height: 80px; font-size: 32px;">
+                    <i class="fas fa-folder-plus"></i>
                 </div>
+                <h4 class="fw-bold text-main mb-3">Hali test yaratilmadi!</h4>
+                <p class="text-muted mb-4 px-4">Siz hozircha hech qanday test yaratmadingiz. Birinchi testingizni yarating va boshqalar bilan ulashing.</p>
+                <a href="{% url 'create_test' %}" class="btn btn-primary px-4 py-2 fw-bold" style="border-radius: 10px;">
+                    <i class="fas fa-plus me-2"></i> Yangi Test Yaratish
+                </a>
             </div>
         </div>
     {% endif %}
 </div>
+
+<style>
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md) !important;
+        border-color: var(--primary) !important;
+    }
+</style>
 {% endblock content %}
