@@ -19,8 +19,22 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from allauth.account.views import login, signup, logout
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('django.contrib.auth.urls')),
-    path('',include('main.urls')),
-]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # Qisqa manzillar - Allauth ko'rinishlarini ishlatadi
+    path('login/', login, name='login'),
+    path('signup/', signup, name='signup'),
+    path('logout/', logout, name='logout'),
+    
+    # Allauth ichki nomlari (redirectlar uchun kerak bo'lishi mumkin)
+    path('login/', login, name='account_login'),
+    path('signup/', signup, name='account_signup'),
+    path('logout/', logout, name='account_logout'),
+    
+    path('accounts/', include('allauth.urls')),
+    path('', include('main.urls')),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

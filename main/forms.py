@@ -1,5 +1,14 @@
 from django import forms
-from .models import Test, Question, Category
+from .models import Test, Question, Category, Profile
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['bio', 'avatar']
+        widgets = {
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'O\'zingiz haqingizda...'}),
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
+        }
 
 class TestForm(forms.ModelForm):
     class Meta:

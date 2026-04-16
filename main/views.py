@@ -3,7 +3,7 @@ from .models import Test, Question, CheckQuestion, CheckTest, Category, Review, 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .forms import TestForm, QuestionForm
+from .forms import TestForm, QuestionForm, ProfileForm
 from django.forms import formset_factory
 from django.http import JsonResponse
 from django.contrib import messages
@@ -22,14 +22,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from django.http import HttpResponse
 import io
 
-def signup(request):
-    form = UserCreationForm()
-    if request.method == 'POST':
-        form = UserCreationForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    return render(request, 'registration/signup.html', {'form': form})
+
 
 from django.db.models import Avg
 
@@ -193,6 +186,17 @@ def test_result(request, checktest_id):
 @login_required(login_url='login')
 def profile(request, username):
     user = get_object_or_404(User, username=username)
+    profile, created = Profile.objects.get_or_create(user=user)
+    
+    if request.method == 'POST' and request.user == user:
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profil muvaffaqiyatli yangilandi.")
+            return redirect('profile', username=username)
+    else:
+        form = ProfileForm(instance=profile)
+
     user_tests = Test.objects.filter(author=user)
     user_checktests = CheckTest.objects.filter(student=user)
     
@@ -215,6 +219,7 @@ def profile(request, username):
         'total_tests_count': total_tests_count,
         'active_users_count': active_users_count,
         'completed_tests_count': completed_tests_count,
+        'form': form,
     }
     return render(request, 'profile.html', context)
 

@@ -114,7 +114,7 @@ class Review(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
-    # Avatar is simplified for now, as Pillow is installed but handling image upload requires MEDIA settings
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     total_score = models.PositiveIntegerField(default=0)
     
     def __str__(self):

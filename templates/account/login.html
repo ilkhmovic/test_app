@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags socialaccount %}
+{% block title %} Tizimga Kirish {% endblock title %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg animate-fade-in-up" style="border-radius: 20px; overflow: hidden; background: var(--bg-card);">
+                <!-- Header with Gradient -->
+                <div class="bg-primary text-white text-center py-4" style="background: var(--primary-gradient) !important;">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle mb-3 shadow-sm" style="width: 65px; height: 65px; font-size: 26px;">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">Xush Kelibsiz!</h3>
+                    <p class="mb-0 opacity-75 mt-1 small">Hisobingizga kirish uchun ma'lumotlarni kiriting</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{% url 'account_login' %}" class="login">
+                        {% csrf_token %}
+                        <div class="crispy-form-wrapper">
+                            {{ form|crispy }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remember" id="id_remember">
+                                <label class="form-check-label small text-muted" for="id_remember">
+                                    Meni eslab qol
+                                </label>
+                            </div>
+                            <a href="{% url 'account_reset_password' %}" class="small text-primary text-decoration-none fw-600">Parolni unutdingizmi?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-primary" style="border-radius: 12px; font-size: 1.1rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i> Kirish
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4 pt-4 border-top" style="border-color: var(--border) !important;">
+                        <span class="d-block text-muted small mb-3">yoki boshqa usullar bilan kiring</span>
+                        
+                        <form action="{% provider_login_url 'google' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger w-100 fw-bold mb-4 d-flex align-items-center justify-content-center py-2" style="border-radius: 12px; border-width: 2px;" formnovalidate>
+                                <i class="fab fa-google fs-5 me-2"></i> Google orqali kirish
+                            </button>
+                        </form>
+                        
+                        <p class="text-muted mb-0">Akkauntingiz yo'qmi? 
+                            <a href="{% url 'account_signup' %}" class="fw-bold ms-1 text-primary text-decoration-none">Ro'yxatdan o'tish</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <a href="{% url 'index' %}" class="text-muted text-decoration-none small hover-link"><i class="fas fa-arrow-left me-1"></i> Bosh sahifaga qaytish</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-link:hover {
+        color: var(--primary) !important;
+    }
+    .fw-600 {
+        font-weight: 600;
+    }
+</style>
+{% endblock content %}

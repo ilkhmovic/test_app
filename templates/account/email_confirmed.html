@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %} Email Tasdiqlandi {% endblock title %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card border-0 shadow-lg bg-card p-5" style="border-radius: 20px;">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-4 shadow" style="width: 80px; height: 80px; font-size: 32px; background: linear-gradient(135deg, #28a745, #20c997) !important;">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                
+                <h3 class="fw-bold text-main mb-3">Tabriklaymiz!</h3>
+                <p class="text-muted mb-4">
+                    Elektron pochta manzilingiz muvaffaqiyatli tasdiqlandi. Endi siz platformaning barcha imkoniyatlaridan foydalanishingiz mumkin.
+                </p>
+                
+                <a href="{% url 'index' %}" class="btn btn-primary rounded-3 px-5 py-2 fw-bold w-100 shadow-sm">
+                    Bosh sahifaga o'tish
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

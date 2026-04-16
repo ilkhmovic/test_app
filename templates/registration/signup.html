@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags socialaccount %}
 {% block title %} Ro'yxatdan o'tish {% endblock title %}
 
 {% block content %}
@@ -26,13 +26,19 @@
                         <button type="submit" class="btn btn-primary w-100 mt-4 py-2 fw-bold" style="border-radius: 12px; font-size: 1.1rem;">
                             <i class="fas fa-user-check me-2"></i> Ro'yxatdan o'tish
                         </button>
-                        
-                        <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border) !important;">
-                            <p class="text-muted mb-0">Biz bilanmisiz? 
-                                <a href="{% url 'login' %}" class="fw-bold ms-1 text-decoration-none">Kirish</a>
-                            </p>
-                        </div>
                     </form>
+                    
+                    <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border) !important;">
+                        <form action="{% provider_login_url 'google' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger w-100 fw-bold mb-3 d-flex align-items-center justify-content-center" style="border-radius: 12px; font-size: 1.1rem;" formnovalidate>
+                                <i class="fab fa-google fs-5 me-2"></i> Google orqali ro'yxatdan o'tish
+                            </button>
+                        </form>
+                        <p class="text-muted mb-0">Biz bilanmisiz? 
+                            <a href="{% url 'login' %}" class="fw-bold ms-1 text-decoration-none">Kirish</a>
+                        </p>
+                    </div>
                 </div>
             </div>
             

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %} Emailni tasdiqlash {% endblock title %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card border-0 shadow-lg bg-card p-5" style="border-radius: 20px;">
+                <!-- Icon with Glow -->
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-4 shadow-lg" 
+                     style="width: 90px; height: 90px; font-size: 38px; background: var(--primary-gradient) !important;">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                
+                <h2 class="fw-bold text-main mb-3">Emailni tasdiqlang</h2>
+                
+                {% if confirmation %}
+                    <p class="text-muted mb-4 lead">
+                        Assalomu alaykum! <strong>@{{ confirmation.email_address.user.username }}</strong> uchun 
+                        <strong>{{ confirmation.email_address.email }}</strong> pochta manzilini tasdiqlash uchun quyidagi tugmani bosing:
+                    </p>
+                    
+                    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-3 fw-bold w-100 shadow-lg" style="font-size: 1.1rem; transition: transform 0.3s;">
+                            <i class="fas fa-check-circle me-2"></i> Tasdiqlashni yakunlash
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-danger border-0 rounded-4 p-4 shadow-sm animate__animated animate__shakeX">
+                        <i class="fas fa-exclamation-circle fa-2x mb-3 d-block"></i>
+                        <h5 class="fw-bold">Xatolik!</h5>
+                        Tasdiqlash linki noto'g'ri, eskirgan yoki allaqachon ishlatilgan.
+                    </div>
+                    <a href="{% url 'account_login' %}" class="btn btn-outline-primary rounded-pill px-4 fw-bold w-100 mt-4 py-2">
+                        <i class="fas fa-arrow-left me-2"></i> Login sahifasiga qaytish
+                    </a>
+                {% endif %}
+                
+                <div class="mt-5 pt-3 border-top text-muted small" style="border-color: var(--border) !important;">
+                    Vantage Test Platformasi &copy; 2026
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-primary:active {
+        transform: scale(0.95);
+    }
+</style>
+{% endblock content %}
