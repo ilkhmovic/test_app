@@ -38,6 +38,11 @@ DEBUG = env('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
+# Security settings for production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+
 
 # Application definition
 
@@ -164,6 +169,7 @@ ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 LOGIN_URL = 'account_login'
 
 # Email settings
