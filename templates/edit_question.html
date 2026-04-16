@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %} Savolni Tahrirlash {% endblock title %}
+{% block content %}
+<div class="container py-4">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5 bg-card">
+        <!-- Header with Warning Gradient (Edit usually uses warning/yellow) -->
+        <div class="p-4 p-md-5 text-dark" style="background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;">
+            <div class="d-flex align-items-center">
+                <div class="bg-white text-warning rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px; font-size: 20px;">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0 text-dark">Savolni Tahrirlash</h2>
+                    <p class="mb-0 opacity-75">{{ test.title }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Savol matni -->
+                <div class="mb-5">
+                    <label class="form-label fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 1px;">Savol Matni</label>
+                    <textarea name="question" class="form-control form-control-lg" rows="4" 
+                              placeholder="Savol matnini bu yerga kiriting..." required
+                              style="border-radius: 16px; font-size: 1.1rem; padding: 20px;">{{ question.question }}</textarea>
+                </div>
+                
+                <!-- Variantlar -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">A</span>
+                            <input type="text" name="a" class="form-control" placeholder="A variant matni" style="border-radius: 0 12px 12px 0;" required value="{{ question.a }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">B</span>
+                            <input type="text" name="b" class="form-control" placeholder="B variant matni" style="border-radius: 0 12px 12px 0;" required value="{{ question.b }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">C</span>
+                            <input type="text" name="c" class="form-control" placeholder="C variant matni" style="border-radius: 0 12px 12px 0;" required value="{{ question.c }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary fw-bold" style="border-radius: 12px 0 0 12px; width: 50px; justify-content: center; border: 1px solid var(--border);">D</span>
+                            <input type="text" name="d" class="form-control" placeholder="D variant matni" style="border-radius: 0 12px 12px 0;" required value="{{ question.d }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- To'g'ri javob -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing: 1px;">To'g'ri Javobni Tanlang</label>
+                        <select name="true_answer" class="form-select form-select-lg" style="border-radius: 12px;" required>
+                            <option value="">Tanlang...</option>
+                            <option value="a" {% if question.true_answer == 'a' %}selected{% endif %}>A Varianti</option>
+                            <option value="b" {% if question.true_answer == 'b' %}selected{% endif %}>B Varianti</option>
+                            <option value="c" {% if question.true_answer == 'c' %}selected{% endif %}>C Varianti</option>
+                            <option value="d" {% if question.true_answer == 'd' %}selected{% endif %}>D Varianti</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Tugmalar -->
+                <div class="mt-5 pt-4 border-top d-flex flex-wrap gap-3" style="border-color: var(--border) !important;">
+                    <button type="submit" class="btn btn-warning btn-lg px-5 fw-bold text-dark" style="border-radius: 12px; background: #f59e0b; border: none;">
+                        <i class="fas fa-save me-2"></i> Saqlash
+                    </button>
+                    <a href="{% url 'test_detail' test.id %}" class="btn btn-outline-secondary btn-lg px-4 fw-bold" style="border-radius: 12px;">
+                        <i class="fas fa-arrow-left me-2"></i> Bekor qilish
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-card { background-color: var(--bg-card); }
+</style>
+{% endblock %}

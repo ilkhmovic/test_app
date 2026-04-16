@@ -74,19 +74,26 @@ def ready_to_test(request, test_id):
 
 @login_required(login_url='login')
 def test(request, test_id):
-    tests = Test.objects.all()
     test = get_object_or_404(Test, id=test_id)
     
+    # Urinishlar sonini tekshirish
     if request.user != test.author:
         attempts_count = CheckTest.objects.filter(student=request.user, test=test).count()
         if attempts_count >= test.maximum_attempts:
             messages.error(request, f"Siz bu testni yechib bo'ldingiz! Maksimal urinishlar soni: {test.maximum_attempts}")
             return redirect('index')
 
-    questions = Question.objects.filter(test=test)
+    session_questions_key = f'test_{test_id}_questions_ids'
     
     if request.method == "POST":
-        # Check duration
+        # Tanlangan savollarni olish
+        question_ids = request.session.get(session_questions_key)
+        if question_ids:
+            questions = Question.objects.filter(id__in=question_ids)
+        else:
+            questions = Question.objects.filter(test=test)
+
+        # Vaqtni tekshirish
         start_time_str = request.session.get(f'test_{test_id}_start')
         is_late = False
         
@@ -95,12 +102,10 @@ def test(request, test_id):
             if start_time.tzinfo is None:
                 start_time = timezone.make_aware(start_time)
             elapsed = timezone.now() - start_time
-            # 1 daqiqa (60s) qo'shimcha vaqt (internet/server kechikishi uchun)
             if elapsed.total_seconds() > (test.duration * 60 + 60):
                 is_late = True
         
         checktest = CheckTest.objects.create(student=request.user, test=test)
-        # Set started_at from session if available
         if start_time_str:
              start_time_obj = datetime.datetime.fromisoformat(start_time_str)
              if start_time_obj.tzinfo is None:
@@ -124,34 +129,61 @@ def test(request, test_id):
         checktest.calculate_results()
         
         if is_late:
-            # Revert score added by calculate_results
             try:
                 profile = request.user.profile
-                score_to_remove = checktest.finded_questions # 1 point per question
+                score_to_remove = checktest.finded_questions
                 if score_to_remove > 0:
                     profile.total_score -= score_to_remove
                     profile.save()
-            except:
-                pass
-
+            except: pass
             checktest.percentage = 0
             checktest.user_passed = False
-            # We keep finded_questions for historical accuracy or set to 0? 
-            # User requirement: "vaqt tugaganidan keyin testdan yiqitgani haqida malumot qosh va unga ball ham berma"
-            # So result should imply 0 score. 
-            # But maybe show "You got X correct but Time Over".
-            # For now, let's keep finded_questions but ensure result page shows failed.
             checktest.save()
+
+        # Sessiyani tozalash
+        if session_questions_key in request.session:
+            del request.session[session_questions_key]
+        if f'test_{test_id}_start' in request.session:
+            del request.session[f'test_{test_id}_start']
 
         return redirect('test_result', checktest_id=checktest.id)
     
-    # GET request - Start Timer
+    # GET request - Savollarni tanlash va tasodifiy tartiblash
+    questions_pool = Question.objects.filter(test=test)
+    total_pool_count = questions_pool.count()
+    expected_count = test.questions_count if (test.questions_count > 0 and test.questions_count <= total_pool_count) else total_pool_count
+
+    if session_questions_key in request.session:
+        question_ids = request.session[session_questions_key]
+        # Agarda limit o'zgargan bo'lsa, sessiyani tozalab qaytadan tanlash kerak
+        if len(question_ids) != expected_count:
+            if session_questions_key in request.session:
+                del request.session[session_questions_key]
+            # Savollarni qaytadan tanlaymiz
+            if test.questions_count > 0 and test.questions_count < total_pool_count:
+                questions = list(questions_pool.order_by('?')[:test.questions_count])
+            else:
+                questions = list(questions_pool.order_by('?'))
+            request.session[session_questions_key] = [q.id for q in questions]
+        else:
+            all_qs = {q.id: q for q in Question.objects.filter(id__in=question_ids)}
+            questions = [all_qs[qid] for qid in question_ids if qid in all_qs]
+    else:
+        # Yangi savollar to'plamini tanlash
+        if test.questions_count > 0 and test.questions_count < total_pool_count:
+            questions = list(questions_pool.order_by('?')[:test.questions_count])
+        else:
+            questions = list(questions_pool.order_by('?'))
+        
+        # ID-larni sessiyada saqlash
+        request.session[session_questions_key] = [q.id for q in questions]
+    
+    # Timer logic
     start_time_str = request.session.get(f'test_{test_id}_start')
     if not start_time_str:
         start_time_str = timezone.now().isoformat()
         request.session[f'test_{test_id}_start'] = start_time_str
     
-    # Parse the datetime string and make it timezone-aware if needed
     start_time = datetime.datetime.fromisoformat(start_time_str)
     if start_time.tzinfo is None:
         start_time = timezone.make_aware(start_time)
@@ -162,7 +194,6 @@ def test(request, test_id):
     context = {
         "test": test, 
         "questions": questions,
-        'tests': tests,
         'remaining_seconds': int(remaining_seconds),
     }
     return render(request, "test.html", context)
@@ -237,12 +268,20 @@ def create_test(request):
             pass_percentage = request.POST.get('pass_percentage')
             duration = request.POST.get('duration', 20)  # Default 20 minutes
             
+            # Fetch and convert questions_count safely
+            raw_questions_count = request.POST.get('questions_count', '0')
+            try:
+                qc = int(raw_questions_count) if raw_questions_count else 0
+            except ValueError:
+                qc = 0
+
             test = Test.objects.create(
                 title=title,
                 category_id=category_id,
-                maximum_attempts=maximum_attempts,
-                pass_percentage=pass_percentage,
-                duration=int(duration),
+                maximum_attempts=int(maximum_attempts) if maximum_attempts else 1,
+                pass_percentage=int(pass_percentage) if pass_percentage else 50,
+                duration=int(duration) if duration else 20,
+                questions_count=qc,
                 author=request.user
             )
             
@@ -676,6 +715,43 @@ def add_question(request, test_id):
         'success_message': success_message,
         'error_message': error_message,
     })
+
+@login_required(login_url='login')
+def edit_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    # Faqat test muallifi tahrirlay oladi
+    if question.test.author != request.user:
+        messages.error(request, "Sizda bu savolni tahrirlash uchun ruxsat yo'q.")
+        return redirect('index')
+
+    if request.method == 'POST':
+        question.question = request.POST.get('question').strip()
+        question.a = request.POST.get('a').strip()
+        question.b = request.POST.get('b').strip()
+        question.c = request.POST.get('c').strip()
+        question.d = request.POST.get('d').strip()
+        question.true_answer = request.POST.get('true_answer').strip().lower()
+        question.save()
+        messages.success(request, "Savol muvaffaqiyatli yangilandi.")
+        return redirect('test_detail', test_id=question.test.id)
+
+    return render(request, 'edit_question.html', {'question': question, 'test': question.test})
+
+@login_required(login_url='login')
+def delete_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    # Faqat test muallifi o'chira oladi
+    if question.test.author != request.user:
+        messages.error(request, "Sizda bu savolni o'chirish uchun ruxsat yo'q.")
+        return redirect('index')
+
+    test_id = question.test.id
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, "Savol muvaffaqiyatli o'chirildi.")
+        return redirect('test_detail', test_id=test_id)
+    
+    return redirect('test_detail', test_id=test_id)
 @login_required(login_url='login')
 def mass_create_questions(request, test_id):
     try:
@@ -822,7 +898,15 @@ def edit_test(request, test_id):
         test.category = get_object_or_404(Category, id=category_id)
         test.maximum_attempts = request.POST.get('maximum_attempts')
         test.pass_percentage = request.POST.get('pass_percentage')
-        test.duration = request.POST.get('duration', 20)
+        test.duration = int(request.POST.get('duration', 20))
+        
+        # Save questions_count safely
+        raw_qc = request.POST.get('questions_count', '0')
+        try:
+            test.questions_count = int(raw_qc) if raw_qc else 0
+        except ValueError:
+            test.questions_count = 0
+            
         test.save()
         messages.success(request, "Test muvaffaqiyatli tahrirlandi.")
         return redirect('test_detail', test_id=test.id)

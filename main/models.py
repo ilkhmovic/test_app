@@ -19,6 +19,7 @@ class Test(models.Model):
     # start_date and end_date removed as per request
     duration = models.PositiveIntegerField(default=20, help_text="Test davomiyligi (daqiqada)")
     pass_percentage = models.PositiveBigIntegerField()
+    questions_count = models.PositiveIntegerField(default=0, help_text="Nechta savol tushishi (0 - barchasi)")
 
     def __str__(self):
         return self.title

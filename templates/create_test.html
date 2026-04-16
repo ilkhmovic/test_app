@@ -71,17 +71,22 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 1px;">Urinishlar soni</label>
                                     <input type="number" name="maximum_attempts" class="form-control form-control-lg" min="1" value="3" required>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 1px;">O'tish foizi (%)</label>
                                     <input type="number" name="pass_percentage" class="form-control form-control-lg" min="0" max="100" value="60" required>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 1px;">Davomiyligi (daqiqa)</label>
                                     <input type="number" name="duration" class="form-control form-control-lg" min="1" value="20" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 1px;">Savollar soni</label>
+                                    <input type="number" name="questions_count" class="form-control form-control-lg" min="0" value="0" required>
+                                    <div class="form-text small">0 - barchasi tushadi</div>
                                 </div>
                             </div>
 
@@ -339,7 +344,8 @@ B) Javob 2
             category: formData.get('category'),
             maximum_attempts: formData.get('maximum_attempts'),
             pass_percentage: formData.get('pass_percentage'),
-            duration: formData.get('duration')
+            duration: formData.get('duration'),
+            questions_count: formData.get('questions_count')
         };
         updateTestInfo();
         const manualTab = new bootstrap.Tab(document.getElementById('manual-tab'));
@@ -352,7 +358,8 @@ B) Javob 2
             <span class="fw-bold text-main">${testData.title}</span> | 
             Urinishlar: <strong>${testData.maximum_attempts}</strong> | 
             O'tish: <strong>${testData.pass_percentage}%</strong> |
-            Davom: <strong>${testData.duration}m</strong>
+            Davom: <strong>${testData.duration}m</strong> |
+            Limit: <strong>${testData.questions_count > 0 ? testData.questions_count : 'Barchasi'}</strong>
         `;
         document.getElementById('manualTestInfo').innerHTML = testInfoHTML;
         document.getElementById('importTestInfo').innerHTML = testInfoHTML;
@@ -421,16 +428,16 @@ B) Javob 2
     });
 
     function addTestDataToForm(form) {
-        const fields = ['title', 'category', 'maximum_attempts', 'pass_percentage', 'duration'];
+        const fields = ['title', 'category', 'maximum_attempts', 'pass_percentage', 'duration', 'questions_count'];
+        form.querySelectorAll('input[type="hidden"]').forEach(i => {
+             if(fields.includes(i.name)) i.remove();
+        });
         fields.forEach(field => {
-            let input = form.querySelector(`input[name="${field}"]`);
-            if(!input) {
-                input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = field;
-                form.appendChild(input);
-            }
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = field;
             input.value = testData[field];
+            form.appendChild(input);
         });
     }
 

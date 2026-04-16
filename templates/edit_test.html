@@ -51,6 +51,12 @@
                                 <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="duration">Davomiyligi (daqiqada)</label>
                                 <input type="number" id="duration" name="duration" class="form-control form-control-lg" value="{{ test.duration }}" min="1" style="border-radius: 12px;" required>
                             </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;" for="questions_count">Savollar soni (tasodifiy)</label>
+                                <input type="number" id="questions_count" name="questions_count" class="form-control form-control-lg" value="{{ test.questions_count }}" min="0" style="border-radius: 12px;" required>
+                                <div class="form-text small">0 - barcha savollar tushadi</div>
+                            </div>
                         </div>
                         
                         <div class="mt-5 pt-4 border-top d-flex flex-column flex-md-row justify-content-between gap-3" style="border-color: var(--border) !important;">

@@ -13,13 +13,14 @@ class ProfileForm(forms.ModelForm):
 class TestForm(forms.ModelForm):
     class Meta:
         model = Test
-        fields = ['title', 'category', 'maximum_attempts', 'duration', 'pass_percentage']
+        fields = ['title', 'category', 'maximum_attempts', 'duration', 'pass_percentage', 'questions_count']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Test nomi'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'maximum_attempts': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Daqiqalarda (masalan 20)'}),
             'pass_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'max': 100}),
+            'questions_count': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'placeholder': 'Tasodifiy savollar soni (0 - hammasi)'}),
         }
 
 class QuestionForm(forms.ModelForm):
