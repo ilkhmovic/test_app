@@ -70,17 +70,6 @@ class CheckTest(models.Model):
             percentage=self.percentage,
             user_passed=self.user_passed
         )
-
-        # Update User Profile Score
-        # Update User Profile Score
-        try:
-            profile = self.student.profile
-            # Har bir to'g'ri javob uchun 1 ball (o'tgan-o'tmaganidan qat'iy nazar)
-            score_increase = self.finded_questions * 1 
-            profile.total_score += score_increase
-            profile.save()
-        except Exception:
-            pass
     
 class CheckQuestion(models.Model):
     checktest = models.ForeignKey(CheckTest, on_delete=models.CASCADE)
@@ -95,12 +84,6 @@ def check_answer(sender, instance, *args, **kwargs):
         instance.is_true = True
     else:
         instance.is_true = False
-
-@receiver(post_save, sender=CheckQuestion)
-def update_test_results(sender, instance, created, **kwargs):
-    """CheckQuestion saqlandi, CheckTest natijalarini yangilash"""
-    if created:
-        instance.checktest.calculate_results()
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

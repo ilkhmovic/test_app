@@ -128,6 +128,14 @@ def test(request, test_id):
         
         checktest.calculate_results()
         
+        # Ballarni faqat bir marta - test yakunida profilga qo'shish
+        try:
+            profile = request.user.profile
+            profile.total_score += checktest.finded_questions
+            profile.save()
+        except:
+            pass
+        
         if is_late:
             try:
                 profile = request.user.profile
