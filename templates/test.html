@@ -3,99 +3,80 @@
 {% block content %}
 <div class="container py-4">
     <!-- Test Header -->
-    <div class="card border-0 shadow-lg mb-4 rounded-4 overflow-hidden">
-        <div class="card-body p-4 p-md-5" style="background: var(--primary-gradient); color: white;">
+    <div class="card border-0 shadow-lg mb-4 rounded-4 overflow-hidden sticky-top" style="top: 10px; z-index: 1020;">
+        <div class="card-body p-3 p-md-4" style="background: var(--primary-gradient); color: white;">
             <div class="row align-items-center">
-                <div class="col-md-8 mb-4 mb-md-0">
-                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold mb-3 d-inline-block">{{ test.category.name }}</span>
-                    <h2 class="fw-bold mb-2 text-white">{{ test.title }}</h2>
-                    <div class="d-flex flex-wrap gap-3 mt-3 opacity-75 fw-medium">
-                        <span class="d-flex align-items-center bg-black bg-opacity-25 px-3 py-1 rounded-pill">
-                            <i class="fas fa-question-circle me-2"></i>
-                            {{ questions|length }} ta savol
-                        </span>
-                        <span class="d-flex align-items-center bg-black bg-opacity-25 px-3 py-1 rounded-pill">
-                            <i class="fas fa-clock me-2"></i>
-                            {{ test.duration }} daqiqa
-                        </span>
+                <div class="col-8 col-md-9">
+                    <h5 class="fw-bold mb-1 text-white text-truncate">{{ test.title }}</h5>
+                    <div class="d-flex flex-wrap gap-2 opacity-75 small fw-medium">
+                        <span class="d-flex align-items-center"><i class="fas fa-question-circle me-1"></i> {{ questions|length }} ta</span>
+                        <span class="d-flex align-items-center"><i class="fas fa-tasks me-1"></i> <span id="answeredCount">0</span> / {{ questions|length }}</span>
                     </div>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="test-timer bg-warning text-dark p-3 rounded-4 d-inline-block shadow-lg animate-pulse border-0" id="timerBox" style="min-width: 160px;">
-                        <div class="fw-bold display-5 mb-1" id="timerDisplay" style="letter-spacing: 2px;">00:00</div>
-                        <small class="fw-bold text-uppercase opacity-75" style="font-size: 0.8rem; letter-spacing: 1px;">Qolgan Vaqt</small>
+                <div class="col-4 col-md-3 text-end">
+                    <div class="test-timer bg-warning text-dark px-2 py-1 rounded-3 d-inline-block shadow-sm" id="timerBox">
+                        <div class="fw-bold fs-4 mb-0" id="timerDisplay">00:00</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Progress bar -->
-    <div class="card border-0 shadow-sm mb-4 bg-card rounded-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="fw-bold text-main d-flex align-items-center"><i class="fas fa-tasks text-primary me-2"></i> Test jarayoni</span>
-                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold"><span id="currentQuestion">1</span> / {{ questions|length }}</span>
-            </div>
-            <div class="progress" style="height: 12px; border-radius: 10px; background: rgba(0,0,0,0.05);">
-                <div class="progress-bar" role="progressbar" style="width: 0%; background: var(--primary-gradient); border-radius: 10px;" id="progressBar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            <!-- Progress bar in sticky header -->
+            <div class="progress mt-3" style="height: 6px; border-radius: 10px; background: rgba(255,255,255,0.2);">
+                <div class="progress-bar bg-white" role="progressbar" style="width: 0%;" id="progressBar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
     </div>
 
     <form method="post" id="testForm" class="test-form">
         {% csrf_token %}
-        <div class="questions-container position-relative">
+        <div class="questions-container">
             {% for question in questions %}
-            <div class="question-card card border-0 shadow-sm mb-4 rounded-4 bg-card" id="question-{{ forloop.counter }}" {% if not forloop.first %}style="display: none;" {% endif %}>
+            <div class="question-card card border-0 shadow-sm mb-4 rounded-4 bg-card" id="question-{{ forloop.counter }}">
                 <div class="card-header border-bottom bg-transparent p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-primary fw-bold d-flex align-items-center">
-                            <i class="fas fa-question-circle me-2 fs-4"></i> Savol {{ forloop.counter }}
-                        </h5>
-                    </div>
+                    <h5 class="mb-0 text-primary fw-bold d-flex align-items-center">
+                        <i class="fas fa-hashtag me-2"></i> {{ forloop.counter }}-savol
+                    </h5>
                 </div>
 
                 <div class="card-body p-4 p-md-5">
                     <div class="question-text mb-5">
-                        <h4 class="fw-bold text-main lh-base" style="font-size: 1.4rem;">{{ question.question }}</h4>
+                        <h4 class="fw-bold text-main lh-base" style="font-size: 1.3rem;">{{ question.question }}</h4>
                     </div>
 
                     <div class="options-container">
-                        <div class="row g-4">
+                        <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="option-card">
                                     <input type="radio" name="{{ question.id }}" value="a" id="{{ question.id }}-a" class="option-input">
-                                    <label for="{{ question.id }}-a" class="option-label m-0 shadow-sm">
-                                        <span class="option-letter shadow-sm">A</span>
-                                        <span class="option-text fw-medium">{{ question.a }}</span>
+                                    <label for="{{ question.id }}-a" class="option-label m-0">
+                                        <span class="option-letter">A</span>
+                                        <span class="option-text">{{ question.a }}</span>
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="option-card">
                                     <input type="radio" name="{{ question.id }}" value="b" id="{{ question.id }}-b" class="option-input">
-                                    <label for="{{ question.id }}-b" class="option-label m-0 shadow-sm">
-                                        <span class="option-letter shadow-sm">B</span>
-                                        <span class="option-text fw-medium">{{ question.b }}</span>
+                                    <label for="{{ question.id }}-b" class="option-label m-0">
+                                        <span class="option-letter">B</span>
+                                        <span class="option-text">{{ question.b }}</span>
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="option-card">
                                     <input type="radio" name="{{ question.id }}" value="c" id="{{ question.id }}-c" class="option-input">
-                                    <label for="{{ question.id }}-c" class="option-label m-0 shadow-sm">
-                                        <span class="option-letter shadow-sm">C</span>
-                                        <span class="option-text fw-medium">{{ question.c }}</span>
+                                    <label for="{{ question.id }}-c" class="option-label m-0">
+                                        <span class="option-letter">C</span>
+                                        <span class="option-text">{{ question.c }}</span>
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="option-card">
                                     <input type="radio" name="{{ question.id }}" value="d" id="{{ question.id }}-d" class="option-input">
-                                    <label for="{{ question.id }}-d" class="option-label m-0 shadow-sm">
-                                        <span class="option-letter shadow-sm">D</span>
-                                        <span class="option-text fw-medium">{{ question.d }}</span>
+                                    <label for="{{ question.id }}-d" class="option-label m-0">
+                                        <span class="option-letter">D</span>
+                                        <span class="option-text">{{ question.d }}</span>
                                     </label>
                                 </div>
                             </div>
@@ -106,49 +87,30 @@
             {% endfor %}
         </div>
 
-        <div class="navigation-buttons mt-4 mb-5">
-            <div class="row g-3">
-                <div class="col-6 col-md-4">
-                    <button type="button" class="btn btn-outline-secondary btn-lg w-100 fw-bold d-none align-items-center justify-content-center gap-2" id="prevBtn" style="border-radius: 14px; padding: 14px;">
-                        <i class="fas fa-arrow-left"></i> Oldingi
-                    </button>
-                </div>
-                <div class="col-6 col-md-4 ms-auto">
-                    <button type="button" class="btn btn-primary btn-lg w-100 fw-bold d-flex align-items-center justify-content-center gap-2" id="nextBtn" style="border-radius: 14px; padding: 14px;">
-                        Keyingi <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold d-none align-items-center justify-content-center gap-2" id="submitBtn" style="border-radius: 14px; padding: 14px;">
-                        <i class="fas fa-paper-plane"></i> Yakunlash
-                    </button>
-                </div>
-            </div>
+        <div class="text-center mt-5 mb-5">
+            <button type="submit" class="btn btn-success btn-lg px-5 fw-bold shadow-lg" id="submitBtn" style="border-radius: 16px; padding: 18px 40px;">
+                <i class="fas fa-paper-plane me-2"></i> Testni Yakunlash
+            </button>
         </div>
     </form>
 
-    <div class="card border border-warning bg-warning bg-opacity-10 rounded-4">
-        <div class="card-body p-4">
-            <h6 class="fw-bold text-warning mb-3 d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle me-2 fs-5"></i> Test Qoidalari
+    <div class="card border border-warning bg-warning bg-opacity-10 rounded-4 mb-5">
+        <div class="card-body p-4 text-center">
+            <h6 class="fw-bold text-warning mb-0">
+                <i class="fas fa-info-circle me-2"></i> Barcha savollarni belgilab, so'ngra yakunlang!
             </h6>
-            <ul class="list-unstyled mb-0 m-0">
-                <li class="mb-2 d-flex"><i class="fas fa-check-circle text-warning mt-1 me-2"></i> <span class="text-main">Har bir savolga bitta javob tanlanishi majburiy.</span></li>
-                <li class="mb-2 d-flex"><i class="fas fa-check-circle text-warning mt-1 me-2"></i> <span class="text-main">Test yakunlangach javoblar qabul qilinadi.</span></li>
-                <li class="mb-0 d-flex"><i class="fas fa-clock text-warning mt-1 me-2"></i> <span class="text-main">Belgilangan vaqt davomida tamomlanishi shart.</span></li>
-            </ul>
         </div>
     </div>
 </div>
 
 <style>
-    .test-timer {
+    .sticky-top {
         transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
-
-    .animate-pulse { animation: pulse 2s infinite; }
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,193,7, 0.4); }
-        50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(255,193,7, 0); }
-    }
+    
+    .test-timer { transition: all 0.3s ease; }
 
     .timer-warning {
         background-color: var(--danger) !important;
@@ -162,55 +124,47 @@
         75% { transform: translateX(-5px); }
     }
 
-    .question-card { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
     .option-card { position: relative; }
     .option-input { display: none; }
 
     .option-label {
         display: flex;
         align-items: center;
-        padding: 16px 20px;
+        padding: 14px 18px;
         border: 2px solid var(--border);
-        border-radius: 16px;
+        border-radius: 14px;
         cursor: pointer;
-        transition: all 0.25s ease;
-        background: transparent;
-        min-height: 80px;
+        transition: all 0.2s ease;
+        background: var(--bg-card);
+        min-height: 60px;
         color: var(--text-main);
     }
 
     .option-label:hover {
         border-color: var(--primary);
         background: rgba(99, 102, 241, 0.05);
-        transform: translateY(-2px);
     }
 
     .option-input:checked + .option-label {
         border-color: var(--primary);
         background: rgba(99, 102, 241, 0.1);
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.1);
     }
 
     .option-letter {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 45px;
-        height: 45px;
+        width: 38px;
+        height: 38px;
         background: var(--bg-main);
         color: var(--primary);
-        border-radius: 12px;
-        font-weight: 800;
-        font-size: 1.1rem;
-        margin-right: 20px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-right: 15px;
         flex-shrink: 0;
         border: 1px solid var(--border);
-        transition: all 0.3s;
     }
 
     .option-input:checked + .option-label .option-letter {
@@ -219,23 +173,15 @@
         border-color: transparent;
     }
 
-    .option-text {
-        font-size: 1.1rem;
-        line-height: 1.4;
-    }
+    .option-text { font-size: 1rem; line-height: 1.4; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const questions = document.querySelectorAll('.question-card');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
+        const testForm = document.getElementById('testForm');
         const progressBar = document.getElementById('progressBar');
-        const currentQuestionSpan = document.getElementById('currentQuestion');
-
-        let currentQuestion = 0;
-        const totalQuestions = questions.length;
+        const answeredCountSpan = document.getElementById('answeredCount');
+        const totalQuestions = {{ questions|length }};
 
         // Timer Logic
         let timeLeft = {{ remaining_seconds }};
@@ -247,7 +193,7 @@
                 clearInterval(timerInterval);
                 timerDisplay.textContent = "00:00";
                 alert("Vaqt tugadi! Test avtomatik yakunlanadi.");
-                document.getElementById('testForm').submit();
+                testForm.submit();
                 return;
             }
 
@@ -263,131 +209,45 @@
         const timerInterval = setInterval(updateTimer, 1000);
         updateTimer();
 
-        function updateProgress() {
-            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-            progressBar.style.width = `${progress}%`;
-            progressBar.setAttribute('aria-valuenow', progress);
-            currentQuestionSpan.textContent = currentQuestion + 1;
-        }
-
-        function showQuestion(index) {
-            questions.forEach((question, i) => {
-                question.style.display = i === index ? 'block' : 'none';
+        function updateStatus() {
+            const answeredCount = new Set();
+            document.querySelectorAll('.option-input:checked').forEach(input => {
+                answeredCount.add(input.name);
             });
             
-            if (index > 0) {
-                prevBtn.classList.remove('d-none');
-                prevBtn.classList.add('d-flex');
-            } else {
-                prevBtn.classList.add('d-none');
-                prevBtn.classList.remove('d-flex');
-            }
+            const count = answeredCount.size;
+            const percentage = (count / totalQuestions) * 100;
             
-            if (index < totalQuestions - 1) {
-                nextBtn.classList.remove('d-none');
-                nextBtn.classList.add('d-flex');
-                submitBtn.classList.add('d-none');
-                submitBtn.classList.remove('d-flex');
-            } else {
-                nextBtn.classList.add('d-none');
-                nextBtn.classList.remove('d-flex');
-                submitBtn.classList.remove('d-none');
-                submitBtn.classList.add('d-flex');
-            }
-            
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function isCurrentQuestionAnswered() {
-            const currentQuestionElement = questions[currentQuestion];
-            const radioInputs = currentQuestionElement.querySelectorAll('input[type="radio"]');
-            for (let input of radioInputs) {
-                if (input.checked) return true;
-            }
-            return false;
-        }
-
-        prevBtn.addEventListener('click', function () {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                showQuestion(currentQuestion);
-                updateOptionStyles();
-            }
-        });
-
-        nextBtn.addEventListener('click', function () {
-            if (!isCurrentQuestionAnswered()) {
-                alert('Iltimos, javob variantlaridan birini tanlang!');
-                return;
-            }
-            if (currentQuestion < totalQuestions - 1) {
-                currentQuestion++;
-                showQuestion(currentQuestion);
-                updateOptionStyles();
-            }
-        });
-
-        document.getElementById('testForm').addEventListener('submit', function (e) {
-            let unansweredQuestions = 0;
-            for (let i = 0; i < questions.length; i++) {
-                if (!isQuestionAnswered(i)) {
-                    unansweredQuestions++;
-                }
-            }
-
-            if (unansweredQuestions > 0) {
-                e.preventDefault();
-                const confirmSubmit = confirm(`${unansweredQuestions} ta savolga javob bermagansiz. Testni shu holatda yakunlamoqchimisiz?`);
-                if (!confirmSubmit) {
-                    for (let i = 0; i < questions.length; i++) {
-                        if (!isQuestionAnswered(i)) {
-                            currentQuestion = i;
-                            showQuestion(currentQuestion);
-                            updateOptionStyles();
-                            break;
-                        }
-                    }
-                    return;
-                }
-            }
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yuklanmoqda...';
-            submitBtn.disabled = true;
-            nextBtn.disabled = true;
-            prevBtn.disabled = true;
-        });
-
-        function isQuestionAnswered(questionIndex) {
-            const radioInputs = questions[questionIndex].querySelectorAll('input[type="radio"]');
-            for (let input of radioInputs) {
-                if (input.checked) return true;
-            }
-            return false;
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
+            answeredCountSpan.textContent = count;
         }
 
         document.querySelectorAll('.option-input').forEach(input => {
-            input.addEventListener('change', function () {
-                if (isCurrentQuestionAnswered() && document.getElementById('nextBtn')) {
-                    nextBtn.classList.remove('btn-secondary');
-                    nextBtn.classList.add('btn-primary');
-                }
-            });
+            input.addEventListener('change', updateStatus);
         });
 
-        function updateOptionStyles() {
-            if (currentQuestion < totalQuestions - 1) {
-                if (isCurrentQuestionAnswered()) {
-                    nextBtn.classList.remove('btn-secondary');
-                    nextBtn.classList.add('btn-primary');
-                } else {
-                    nextBtn.classList.remove('btn-primary');
-                    nextBtn.classList.add('btn-secondary');
+        testForm.addEventListener('submit', function (e) {
+            const answeredCount = new Set();
+            document.querySelectorAll('.option-input:checked').forEach(input => {
+                answeredCount.add(input.name);
+            });
+            
+            const unanswered = totalQuestions - answeredCount.size;
+            if (unanswered > 0) {
+                if (!confirm(`${unanswered} ta savolga javob bermadingiz. Baribir topshirasizmi?`)) {
+                    e.preventDefault();
+                    return;
                 }
             }
-        }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Yuklanmoqda...';
+            submitBtn.disabled = true;
+        });
 
-        showQuestion(currentQuestion);
-        updateOptionStyles();
+        // Initialize status
+        updateStatus();
     });
 </script>
 {% endblock content %}
