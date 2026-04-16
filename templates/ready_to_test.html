@@ -48,11 +48,20 @@
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-center mb-4">
-                        <span class="text-muted me-2">Test muallifi:</span>
-                        <a href="{% url 'profile' test.author.username %}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" style="padding: 2px 12px;">
-                            @{{ test.author.username }}
-                        </a>
+                    <div class="d-flex align-items-center justify-content-center mb-4 gap-3">
+                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-primary bg-opacity-10 shadow-sm" style="width: 45px; height: 45px;">
+                            {% if test.author.profile.avatar %}
+                                <img src="{{ test.author.profile.avatar.url }}" alt="Author" class="w-100 h-100 object-fit-cover">
+                            {% else %}
+                                <i class="fas fa-user text-primary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="text-start">
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">Test muallifi:</small>
+                            <a href="{% url 'profile' test.author.username %}" class="text-decoration-none fw-bold text-main">
+                                @{{ test.author.username }}
+                            </a>
+                        </div>
                     </div>
                     
                     <div class="alert alert-warning border-0 rounded-3 d-flex align-items-center" style="background: rgba(245, 158, 11, 0.1); color: #b45309;">

@@ -90,13 +90,27 @@
 
                     {% if user.is_authenticated %}
                     <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle fs-5"></i> <span>{{ user.username }}</span>
+                        <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" style="border-radius: 12px; padding: 6px 12px;">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-primary bg-opacity-10" style="width: 28px; height: 28px;">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="User" class="w-100 h-100 object-fit-cover">
+                                {% else %}
+                                    <i class="fas fa-user-circle fs-5"></i>
+                                {% endif %}
+                            </div>
+                            <span>{{ user.username }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border);">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-2" style="border-radius: 14px; background: var(--bg-card); border: 1px solid var(--border); min-width: 200px;">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center mb-1" href="{% url 'profile' user.username %}" style="color: var(--text-main);">
-                                    <i class="fas fa-user text-primary me-2"></i> Profil
+                                <a class="dropdown-item d-flex align-items-center gap-3 p-2 rounded-3 mb-1" href="{% url 'profile' user.username %}" style="color: var(--text-main);">
+                                    <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-primary bg-opacity-10" style="width: 32px; height: 32px;">
+                                        {% if user.profile.avatar %}
+                                            <img src="{{ user.profile.avatar.url }}" alt="Profile" class="w-100 h-100 object-fit-cover">
+                                        {% else %}
+                                            <i class="fas fa-user text-primary"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="fw-bold">Mening Profilim</div>
                                 </a>
                             </li>
                             <li>

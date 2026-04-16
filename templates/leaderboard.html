@@ -41,8 +41,12 @@
                                     </td>
                                     <td class="py-4 text-start ps-5">
                                         <div class="d-flex align-items-center">
-                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px;">
-                                                <i class="fas fa-user"></i>
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3 overflow-hidden shadow-sm" style="width: 45px; height: 45px;">
+                                                {% if profile.avatar %}
+                                                    <img src="{{ profile.avatar.url }}" alt="{{ profile.user.username }}" class="w-100 h-100 object-fit-cover">
+                                                {% else %}
+                                                    <i class="fas fa-user"></i>
+                                                {% endif %}
                                             </div>
                                             <span class="fw-bold text-main" style="font-size: 1.1rem;">{{ profile.user.username }}</span>
                                         </div>

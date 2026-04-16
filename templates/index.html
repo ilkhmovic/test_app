@@ -188,11 +188,20 @@
                         </div>
                     </div>
                     <div class="card-footer border-0 pt-0 pb-4 mt-auto bg-transparent d-flex justify-content-between align-items-end">
-                        <div>
-                            <small class="text-muted d-block mb-1">Muallif</small>
-                            <a href="{% url 'profile' test.author.username %}" class="text-decoration-none fw-bold" style="position: relative; z-index: 2;">
-                                @{{ test.author.username }}
-                            </a>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-primary bg-opacity-10 me-2 shadow-sm" style="width: 36px; height: 36px;">
+                                {% if test.author.profile.avatar %}
+                                    <img src="{{ test.author.profile.avatar.url }}" alt="Author" class="w-100 h-100 object-fit-cover">
+                                {% else %}
+                                    <i class="fas fa-user text-primary" style="font-size: 0.8rem;"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <small class="text-muted d-block mb-0" style="font-size: 0.75rem;">Muallif</small>
+                                <a href="{% url 'profile' test.author.username %}" class="text-decoration-none fw-bold text-main" style="position: relative; z-index: 2; font-size: 0.9rem;">
+                                    @{{ test.author.username }}
+                                </a>
+                            </div>
                         </div>
                         <div class="text-end">
                             <small class="text-muted d-block mb-1"><i class="fas fa-clock me-1"></i> {{ test.duration }} daq</small>
