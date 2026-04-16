@@ -150,32 +150,37 @@ def test(request, test_id):
     
     # GET request - Savollarni tanlash va tasodifiy tartiblash
     questions_pool = Question.objects.filter(test=test)
-    total_pool_count = questions_pool.count()
-    expected_count = test.questions_count if (test.questions_count > 0 and test.questions_count <= total_pool_count) else total_pool_count
+    
+    # Noyob matnli savollarni ajratib olish (Dublikatlarni oldini olish uchun)
+    all_qs_list = list(questions_pool.order_by('id')) 
+    unique_pool = []
+    seen_texts = set()
+    for q in all_qs_list:
+        norm_text = q.question.strip().lower()
+        if norm_text not in seen_texts:
+            unique_pool.append(q)
+            seen_texts.add(norm_text)
+    
+    total_unique_count = len(unique_pool)
+    expected_count = test.questions_count if (test.questions_count > 0 and test.questions_count <= total_unique_count) else total_unique_count
 
     if session_questions_key in request.session:
         question_ids = request.session[session_questions_key]
-        # Agarda limit o'zgargan bo'lsa, sessiyani tozalab qaytadan tanlash kerak
         if len(question_ids) != expected_count:
             if session_questions_key in request.session:
                 del request.session[session_questions_key]
-            # Savollarni qaytadan tanlaymiz
-            if test.questions_count > 0 and test.questions_count < total_pool_count:
-                questions = list(questions_pool.order_by('?')[:test.questions_count])
-            else:
-                questions = list(questions_pool.order_by('?'))
+            
+            import random
+            random.shuffle(unique_pool)
+            questions = unique_pool[:expected_count]
             request.session[session_questions_key] = [q.id for q in questions]
         else:
-            all_qs = {q.id: q for q in Question.objects.filter(id__in=question_ids)}
-            questions = [all_qs[qid] for qid in question_ids if qid in all_qs]
+            all_qs_map = {q.id: q for q in Question.objects.filter(id__in=question_ids)}
+            questions = [all_qs_map[qid] for qid in question_ids if qid in all_qs_map]
     else:
-        # Yangi savollar to'plamini tanlash
-        if test.questions_count > 0 and test.questions_count < total_pool_count:
-            questions = list(questions_pool.order_by('?')[:test.questions_count])
-        else:
-            questions = list(questions_pool.order_by('?'))
-        
-        # ID-larni sessiyada saqlash
+        import random
+        random.shuffle(unique_pool)
+        questions = unique_pool[:expected_count]
         request.session[session_questions_key] = [q.id for q in questions]
     
     # Timer logic
@@ -296,17 +301,20 @@ def create_test(request):
                 manual_true_answers = request.POST.getlist('manual_true_answer[]')
                 
                 for i in range(len(manual_questions)):
-                    if manual_questions[i].strip():
-                        Question.objects.create(
-                            test=test,
-                            question=manual_questions[i],
-                            a=manual_a[i],
-                            b=manual_b[i],
-                            c=manual_c[i],
-                            d=manual_d[i],
-                            true_answer=manual_true_answers[i]
-                        )
-                        saved_questions += 1
+                    q_text = manual_questions[i].strip()
+                    if q_text:
+                        # Check for existing
+                        if not Question.objects.filter(test=test, question=q_text).exists():
+                            Question.objects.create(
+                                test=test,
+                                question=q_text,
+                                a=manual_a[i],
+                                b=manual_b[i],
+                                c=manual_c[i],
+                                d=manual_d[i],
+                                true_answer=manual_true_answers[i]
+                            )
+                            saved_questions += 1
             
             elif method == 'import':
                 if request.FILES.get('import_file'):
@@ -588,16 +596,19 @@ def import_questions(request, test_id):
             saved_count = 0
             for index, row in df.iterrows():
                 if all(k in row for k in ['question', 'a', 'b', 'c', 'd', 'true_answer']):
-                    Question.objects.create(
-                        test=test,
-                        question=row['question'],
-                        a=row['a'],
-                        b=row['b'],
-                        c=row['c'],
-                        d=row['d'],
-                        true_answer=row['true_answer']
-                    )
-                    saved_count += 1
+                    q_text = str(row['question']).strip()
+                    # Skip if already exists in this test
+                    if not Question.objects.filter(test=test, question=q_text).exists():
+                        Question.objects.create(
+                            test=test,
+                            question=q_text,
+                            a=row['a'],
+                            b=row['b'],
+                            c=row['c'],
+                            d=row['d'],
+                            true_answer=row['true_answer']
+                        )
+                        saved_count += 1
             
             messages.success(request, f"{saved_count} ta savol muvaffaqiyatli qo'shildi")
             
@@ -632,16 +643,18 @@ def parse_questions(request, test_id):
             try:
                 question_num, question_text, a, b, c, d, true_answer = match
                 
-                Question.objects.create(
-                    test=test,
-                    question=question_text.strip(),
-                    a=a.strip(),
-                    b=b.strip(),
-                    c=c.strip(),
-                    d=d.strip(),
-                    true_answer=true_answer.lower().strip()
-                )
-                saved_count += 1
+                q_text = question_text.strip()
+                if not Question.objects.filter(test=test, question=q_text).exists():
+                    Question.objects.create(
+                        test=test,
+                        question=q_text,
+                        a=a.strip(),
+                        b=b.strip(),
+                        c=c.strip(),
+                        d=d.strip(),
+                        true_answer=true_answer.lower().strip()
+                    )
+                    saved_count += 1
                 
             except Exception as e:
                 continue
